@@ -1,0 +1,145 @@
+{
+  "info": {
+    "name": "Skill-Swap Django API",
+    "description": "Versioned API contract for the submitted Django + MongoDB + JWT Skill-Swap stack.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "api", "value": "http://localhost:8000/api/v1" },
+    { "key": "access_token", "value": "replace-with-short-lived-jwt" },
+    {
+      "key": "certificate_token",
+      "value": "replace-with-public-verification-token"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Vaibhav Singh\",\n  \"email\": \"vaibhav@example.com\",\n  \"password\": \"change-me-securely\"\n}"
+            },
+            "url": "{{api}}/auth/register"
+          }
+        },
+        {
+          "name": "Verify OTP",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"vaibhav@example.com\",\n  \"code\": \"000000\"\n}"
+            },
+            "url": "{{api}}/auth/verify-otp"
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"vaibhav@example.com\",\n  \"password\": \"change-me-securely\"\n}"
+            },
+            "url": "{{api}}/auth/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Member workflows",
+      "item": [
+        {
+          "name": "Current profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": "{{api}}/auth/me"
+          }
+        },
+        {
+          "name": "Discover reciprocal matches",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": "{{api}}/matches/discover"
+          }
+        },
+        {
+          "name": "Submit assessment",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answers\": {\"question-id\": \"option-a\"}\n}"
+            },
+            "url": "{{api}}/assessments/attempt-id/submit"
+          }
+        },
+        {
+          "name": "Issue video credentials",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": "{{api}}/sessions/session-id/video-token"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Public",
+      "item": [
+        {
+          "name": "Verify certificate",
+          "request": {
+            "method": "GET",
+            "url": "{{api}}/certificates/verify/{{certificate_token}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Administrator",
+      "item": [
+        {
+          "name": "Dashboard metrics",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": "{{api}}/admin/dashboard"
+          }
+        },
+        {
+          "name": "Whole-platform activity",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": "{{api}}/admin/activity?limit=50"
+          }
+        }
+      ]
+    }
+  ]
+}
