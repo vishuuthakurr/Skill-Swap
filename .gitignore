@@ -119,4 +119,5 @@ __pycache__/
 *$py.class
 *.so
 .pytest_cache/
+.freebuff/
 
