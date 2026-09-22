@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import "dotenv/config";
 
 const required = [
   "MONGODB_URI",

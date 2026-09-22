@@ -21,6 +21,7 @@ import {
   CalendarDays,
   ClipboardList,
   FileCheck2,
+  GraduationCap,
   LayoutDashboard,
   LogOut,
   Menu,
@@ -54,9 +55,9 @@ type MenuItem = {
 
 const memberItems: MenuItem[] = [
   { icon: LayoutDashboard, label: "Overview", path: "/app/dashboard" },
-  { icon: Search, label: "Discover matches", path: "/app/matches/discover" },
-  { icon: BookOpenCheck, label: "My skills", path: "/app/my-skills" },
-  { icon: MessageCircle, label: "Conversations", path: "/app/messages" },
+  { icon: Search, label: "Discover Matches", path: "/app/matches/discover" },
+  { icon: BookOpenCheck, label: "My Skills & Tests", path: "/app/my-skills" },
+  { icon: MessageCircle, label: "Messages", path: "/app/messages" },
   { icon: CalendarDays, label: "Sessions", path: "/app/sessions" },
   { icon: FileCheck2, label: "Certificates", path: "/app/certificates" },
   { icon: Bell, label: "Notifications", path: "/app/notifications" },
@@ -64,9 +65,9 @@ const memberItems: MenuItem[] = [
 
 const adminItems: MenuItem[] = [
   { icon: LayoutDashboard, label: "Overview", path: "/admin/dashboard" },
-  { icon: Users, label: "Users", path: "/admin/users" },
-  { icon: ActivityIcon, label: "Activity monitor", path: "/admin/activity" },
-  { icon: BookOpenCheck, label: "Skills & questions", path: "/admin/skills" },
+  { icon: Users, label: "Users & Teachers", path: "/admin/users" },
+  { icon: ActivityIcon, label: "Activity Monitor", path: "/admin/activity" },
+  { icon: BookOpenCheck, label: "Question Bank", path: "/admin/skills" },
   { icon: ClipboardList, label: "Assessments", path: "/admin/assessments" },
   { icon: UsersRound, label: "Matches", path: "/admin/matches" },
   {
@@ -75,10 +76,10 @@ const adminItems: MenuItem[] = [
     path: "/admin/communications",
   },
   { icon: CalendarDays, label: "Sessions", path: "/admin/sessions" },
-  { icon: ShieldCheck, label: "Reports & moderation", path: "/admin/reports" },
+  { icon: ShieldCheck, label: "Disputes & Reports", path: "/admin/reports" },
   { icon: FileCheck2, label: "Certificates", path: "/admin/certificates" },
   { icon: Bell, label: "Announcements", path: "/admin/announcements" },
-  { icon: Settings2, label: "Platform settings", path: "/admin/settings" },
+  { icon: Settings2, label: "Settings", path: "/admin/settings" },
 ];
 
 function ActivityIcon(props: React.ComponentProps<"span">) {
@@ -98,7 +99,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
   variant?: DashboardVariant;
 }) {
-  const [sidebarWidth, setSidebarWidth] = useState(272);
+  const [sidebarWidth, setSidebarWidth] = useState(260);
   const { loading, user } = useAuth();
   useEffect(() => {
     const saved = window.localStorage.getItem(`skill-swap-${variant}-sidebar`);
@@ -113,20 +114,22 @@ export default function DashboardLayout({
   if (loading) return <DashboardLayoutSkeleton />;
   if (!user)
     return (
-      <div className="page-wash flex min-h-screen items-center justify-center p-6">
-        <div className="bracket max-w-md rounded-[1.75rem] border border-white/80 bg-white/60 p-10 text-center shadow-[0_20px_60px_rgba(117,98,145,0.12)]">
-          <Sparkles className="mx-auto size-8 text-[#8f81ad]" />
-          <h1 className="mt-6 font-serif text-3xl text-[#5b506e]">
-            Sign in to continue
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 p-6">
+        <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-lg">
+          <div className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+            <GraduationCap className="size-6" />
+          </div>
+          <h1 className="mt-4 text-2xl font-bold tracking-tight text-slate-900">
+            Sign In to SkillSwap PRO
           </h1>
-          <p className="mt-3 text-sm leading-7 text-slate-600">
-            Your private learning workspace is waiting for you.
+          <p className="mt-2 text-sm text-slate-500">
+            Access your courses, swaps, assessments, and verified credentials.
           </p>
           <Button
             onClick={() => startLogin()}
-            className="mt-7 rounded-full bg-[#6c5d88] px-7 text-white"
+            className="mt-6 w-full rounded-lg bg-blue-600 py-2.5 font-semibold text-white shadow-sm hover:bg-blue-700"
           >
-            Sign in
+            Sign In
           </Button>
         </div>
       </div>
@@ -158,88 +161,104 @@ function DashboardContent({
   user: NonNullable<ReturnType<typeof useAuth>["user"]>;
 }) {
   const [location, setLocation] = useLocation();
-  const { state, toggleSidebar } = useSidebar();
+  const { toggleSidebar } = useSidebar();
   const { logout } = useAuth();
   const isMobile = useIsMobile();
-  const current = items.find(item => location.startsWith(item.path));
+  const current = items.find((item) => location.startsWith(item.path));
+
   return (
-    <>
+    <div className="flex min-h-screen w-full bg-slate-50">
       <Sidebar
         collapsible="icon"
-        className="border-r border-[#e7e1eb] bg-[#fbfaf8]/90"
+        className="border-r border-slate-200 bg-white"
       >
-        <SidebarHeader className="h-20 justify-center border-b border-[#eee9f0]">
+        <SidebarHeader className="h-16 justify-center border-b border-slate-200 px-4">
           <Link
             href={variant === "admin" ? "/admin/dashboard" : "/app/dashboard"}
-            className="flex items-center gap-3 px-2"
+            className="flex items-center gap-2.5"
           >
-            <span className="grid size-9 place-items-center rounded-full border border-[#b9afcf] bg-[#f1ecfa] text-[#61567d]">
-              <Sparkles className="size-4" />
-            </span>
-            <span className="group-data-[collapsible=icon]:hidden">
-              <span className="block font-serif text-xl text-[#61567d]">
-                Skill-Swap
+            <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm">
+              <GraduationCap className="size-5" />
+            </div>
+            <div className="group-data-[collapsible=icon]:hidden leading-tight">
+              <div className="flex items-center gap-1.5">
+                <span className="text-lg font-bold tracking-tight text-slate-900">
+                  Skill<span className="text-blue-600">Swap</span>
+                </span>
+                <span className="rounded bg-blue-100 px-1 py-0.2 text-[9px] font-bold text-blue-700">
+                  {variant === "admin" ? "ADMIN" : "PRO"}
+                </span>
+              </div>
+              <span className="text-[10px] text-slate-400">
+                {variant === "admin" ? "Platform Control" : "Learning Workspace"}
               </span>
-              <span className="block text-[9px] uppercase tracking-[0.2em] text-slate-500">
-                {variant === "admin" ? "steward workspace" : "your exchange"}
-              </span>
-            </span>
+            </div>
           </Link>
         </SidebarHeader>
-        <SidebarContent className="px-2 py-5">
-          <div className="mb-3 flex items-center justify-between px-2 group-data-[collapsible=icon]:justify-center">
-            <p className="text-[9px] font-semibold uppercase tracking-[0.2em] text-slate-400 group-data-[collapsible=icon]:hidden">
-              {variant === "admin" ? "Monitor" : "Workspace"}
+
+        <SidebarContent className="px-3 py-4">
+          <div className="mb-2 flex items-center justify-between px-2 group-data-[collapsible=icon]:justify-center">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 group-data-[collapsible=icon]:hidden">
+              {variant === "admin" ? "Platform Navigation" : "Workspace Menu"}
             </p>
             <button
               onClick={toggleSidebar}
               aria-label="Toggle navigation"
-              className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-[#f1ecfa] hover:text-[#61567d]"
+              className="rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
             >
-              <PanelLeft className="size-4" />
+              <PanelLeft className="size-3.5" />
             </button>
           </div>
-          <SidebarMenu>
-            {items.map(item => (
-              <SidebarMenuItem key={item.path}>
-                <SidebarMenuButton
-                  isActive={location.startsWith(item.path)}
-                  onClick={() => setLocation(item.path)}
-                  tooltip={item.label}
-                  className="h-10 rounded-xl text-slate-600 data-[active=true]:bg-[#eee6f7] data-[active=true]:text-[#61567d]"
-                >
-                  <item.icon className="size-4" />
-                  <span>{item.label}</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
+
+          <SidebarMenu className="gap-1">
+            {items.map((item) => {
+              const active = location.startsWith(item.path);
+              return (
+                <SidebarMenuItem key={item.path}>
+                  <SidebarMenuButton
+                    isActive={active}
+                    onClick={() => setLocation(item.path)}
+                    tooltip={item.label}
+                    className={`h-9.5 rounded-lg px-3 text-sm font-medium transition-colors ${
+                      active
+                        ? "bg-blue-600 text-white shadow-sm hover:bg-blue-700 hover:text-white"
+                        : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                    }`}
+                  >
+                    <item.icon className={`size-4.5 ${active ? "text-white" : "text-slate-500"}`} />
+                    <span>{item.label}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              );
+            })}
           </SidebarMenu>
         </SidebarContent>
-        <SidebarFooter className="border-t border-[#eee9f0] p-3">
+
+        <SidebarFooter className="border-t border-slate-200 p-3">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="flex w-full items-center gap-3 rounded-xl p-2 text-left transition-colors hover:bg-[#f4f0f6] group-data-[collapsible=icon]:justify-center">
-                <Avatar className="size-9 border border-white shadow-sm">
-                  <AvatarFallback className="bg-[#e9e2f2] text-xs text-[#6c5d88]">
+              <button className="flex w-full items-center gap-2.5 rounded-xl p-2 text-left transition-colors hover:bg-slate-100 group-data-[collapsible=icon]:justify-center">
+                <Avatar className="size-9 border border-slate-200 shadow-sm">
+                  <AvatarFallback className="bg-blue-50 text-xs font-bold text-blue-700">
                     {user.name?.slice(0, 2).toUpperCase() || "SS"}
                   </AvatarFallback>
                 </Avatar>
-                <span className="min-w-0 flex-1 group-data-[collapsible=icon]:hidden">
-                  <span className="block truncate text-sm font-medium text-slate-700">
+                <div className="min-w-0 flex-1 group-data-[collapsible=icon]:hidden">
+                  <p className="truncate text-xs font-semibold text-slate-900">
                     {user.name || "Member"}
-                  </span>
-                  <span className="block truncate text-xs text-slate-500">
+                  </p>
+                  <p className="truncate text-[11px] text-slate-500">
                     {variant === "admin"
                       ? "Administrator"
-                      : user.email || "Member"}
-                  </span>
-                </span>
+                      : user.email || "Verified Member"}
+                  </p>
+                </div>
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-52">
+            <DropdownMenuContent align="end" className="w-52 shadow-lg">
               <DropdownMenuItem
                 onClick={() => logout()}
-                className="cursor-pointer text-[#ba6268]"
+                className="cursor-pointer text-red-600 hover:bg-red-50"
               >
                 <LogOut className="mr-2 size-4" /> Sign out
               </DropdownMenuItem>
@@ -247,17 +266,20 @@ function DashboardContent({
           </DropdownMenu>
         </SidebarFooter>
       </Sidebar>
-      <SidebarInset className="bg-transparent">
+
+      <SidebarInset className="flex-1 bg-slate-50">
         {isMobile && (
-          <div className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-white/80 bg-[#fbfaf8]/85 px-3 backdrop-blur">
-            <SidebarTrigger className="size-9 rounded-lg bg-white/60" />
-            <span className="font-serif text-lg text-[#61567d]">
-              {current?.label || "Workspace"}
-            </span>
+          <div className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-slate-200 bg-white/95 px-4 backdrop-blur">
+            <div className="flex items-center gap-2">
+              <SidebarTrigger className="size-8 rounded-lg border border-slate-200" />
+              <span className="text-base font-bold text-slate-900">
+                {current?.label || "Workspace"}
+              </span>
+            </div>
           </div>
         )}
-        <main className="min-h-screen p-4 sm:p-7 lg:p-10">{children}</main>
+        <main className="min-h-screen p-5 sm:p-8 lg:p-10">{children}</main>
       </SidebarInset>
-    </>
+    </div>
   );
 }

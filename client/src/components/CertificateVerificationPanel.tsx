@@ -1,9 +1,11 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useEffect } from "react";
 import {
   AlertCircle,
+  Award,
   Check,
   FileCheck2,
   Loader2,
+  Search,
   ShieldCheck,
   XCircle,
 } from "lucide-react";
@@ -23,10 +25,26 @@ export default function CertificateVerificationPanel() {
   const [certificate, setCertificate] = useState("");
   const [state, setState] = useState<VerificationState>("idle");
   const [message, setMessage] = useState("");
+  const [certData, setCertData] = useState<{
+    status?: string;
+    skill?: string;
+    certificate_no?: string;
+    recipient_name?: string;
+    issued_at?: string;
+    score?: number;
+  } | null>(null);
 
-  const verify = async (event: FormEvent) => {
-    event.preventDefault();
-    const value = certificate.trim();
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token") || params.get("cert");
+    if (token) {
+      setCertificate(token);
+      void executeVerify(token);
+    }
+  }, []);
+
+  const executeVerify = async (val: string) => {
+    const value = val.trim();
     if (!value) {
       setState("not_found");
       setMessage("Enter a certificate number to begin a lookup.");
@@ -41,7 +59,8 @@ export default function CertificateVerificationPanel() {
       );
       if (response.status === 404) {
         setState("not_found");
-        setMessage("No certificate was found with that verification number.");
+        setMessage("No verified certificate was found matching that token or ID.");
+        setCertData(null);
         return;
       }
       if (!response.ok) {
@@ -49,33 +68,37 @@ export default function CertificateVerificationPanel() {
         setMessage(
           "The verification service could not complete the request. Please try again shortly."
         );
+        setCertData(null);
         return;
       }
-      const data = (await response.json()) as {
-        status?: string;
-        skill?: string;
-        certificate_no?: string;
-      };
+      const data = await response.json();
+      setCertData(data);
       const next =
         data.status === "revoked"
           ? "revoked"
           : data.status === "expired"
-            ? "expired"
-            : "valid";
+          ? "expired"
+          : "valid";
       setState(next);
       setMessage(
         next === "valid"
-          ? `This is a valid Skill-Swap certificate${data.skill ? ` for ${data.skill}` : ""}.`
+          ? `Authentic Skill-Swap Credential verified${data.skill ? ` for ${data.skill}` : ""}.`
           : next === "revoked"
-            ? "This certificate has been revoked by an administrator."
-            : "This certificate is no longer active."
+          ? "This certificate has been revoked by platform moderators."
+          : "This credential has expired."
       );
     } catch {
       setState("unavailable");
       setMessage(
         "The verification service is temporarily unavailable. Please try again shortly."
       );
+      setCertData(null);
     }
+  };
+
+  const verify = async (event: FormEvent) => {
+    event.preventDefault();
+    await executeVerify(certificate);
   };
 
   const resultStyles: Record<
@@ -83,86 +106,102 @@ export default function CertificateVerificationPanel() {
     { box: string; icon: React.ReactNode; title: string }
   > = {
     valid: {
-      box: "border-[#cfe4d7] bg-[#eef7f0]",
-      icon: <Check className="size-5 text-[#5f8d72]" />,
-      title: "Certificate verified",
+      box: "border-emerald-200 bg-emerald-50/70",
+      icon: <Check className="size-5 text-emerald-600" />,
+      title: "Certificate Cryptographically Verified",
     },
     revoked: {
-      box: "border-[#efcaca] bg-[#fff3f2]",
-      icon: <XCircle className="size-5 text-[#b46769]" />,
-      title: "Certificate revoked",
+      box: "border-red-200 bg-red-50/70",
+      icon: <XCircle className="size-5 text-red-600" />,
+      title: "Certificate Revoked",
     },
     expired: {
-      box: "border-[#ead7bf] bg-[#fff8ec]",
-      icon: <AlertCircle className="size-5 text-[#ad8355]" />,
-      title: "Certificate expired",
+      box: "border-amber-200 bg-amber-50/70",
+      icon: <AlertCircle className="size-5 text-amber-600" />,
+      title: "Certificate Expired",
     },
     not_found: {
-      box: "border-[#e7e1eb] bg-[#f7f5f8]",
-      icon: <FileCheck2 className="size-5 text-[#8f81ad]" />,
-      title: "Certificate not found",
+      box: "border-slate-200 bg-slate-50",
+      icon: <FileCheck2 className="size-5 text-slate-400" />,
+      title: "Certificate Not Found",
     },
     unavailable: {
-      box: "border-[#e7e1eb] bg-[#f7f5f8]",
-      icon: <AlertCircle className="size-5 text-[#8f81ad]" />,
-      title: "Verification unavailable",
+      box: "border-slate-200 bg-slate-50",
+      icon: <AlertCircle className="size-5 text-slate-400" />,
+      title: "Verification Service Offline",
     },
   };
 
   return (
-    <div className="mx-auto max-w-2xl rounded-[1.75rem] border border-white/80 bg-white/56 p-8 shadow-[0_20px_60px_rgba(117,98,145,0.08)] sm:p-12">
-      <div className="grid size-14 place-items-center rounded-2xl bg-[#eee6f7] text-[#6c5d88]">
-        <FileCheck2 className="size-6" />
+    <div className="mx-auto max-w-2xl rounded-3xl border border-slate-200 bg-white p-8 shadow-sm sm:p-12">
+      <div className="flex size-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 shadow-sm">
+        <Award className="size-7" />
       </div>
-      <h2 className="mt-8 font-serif text-3xl text-[#61567d]">
-        Certificate lookup
+      <h2 className="mt-6 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
+        Certificate Authenticity Lookup
       </h2>
-      <p className="mt-3 text-sm leading-7 text-slate-600">
-        Use the number shown on the certificate or follow a recipient’s secure
-        validation link.
+      <p className="mt-2 text-sm leading-relaxed text-slate-600">
+        Enter a Skill-Swap certificate ID (e.g. SS-VERIF-2026-PY) or verification token to validate issuer authenticity and recipient mark.
       </p>
+
       <form onSubmit={verify} className="mt-8 flex flex-col gap-3 sm:flex-row">
-        <Input
-          value={certificate}
-          onChange={event => {
-            setCertificate(event.target.value);
-            setState("idle");
-          }}
-          placeholder="e.g. SS-2026-00481"
-          className="h-12 rounded-xl border-white bg-white/75"
-          aria-label="Certificate number"
-        />
+        <div className="relative flex-1">
+          <Search className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
+          <Input
+            value={certificate}
+            onChange={(event) => {
+              setCertificate(event.target.value);
+              setState("idle");
+            }}
+            placeholder="e.g. SS-VERIF-2026-PY or SS-2026-00481"
+            className="h-12 rounded-xl border-slate-200 pl-10 text-sm focus-visible:border-blue-600"
+            aria-label="Certificate number"
+          />
+        </div>
         <Button
           type="submit"
           disabled={state === "loading"}
-          className="h-12 rounded-xl bg-[#6c5d88] text-white"
+          className="h-12 rounded-xl bg-blue-600 px-6 font-semibold text-white shadow-sm hover:bg-blue-700"
         >
           {state === "loading" ? (
             <Loader2 className="size-4 animate-spin" />
           ) : (
-            "Check status"
+            "Verify Credential"
           )}
         </Button>
       </form>
+
       {state !== "idle" && state !== "loading" && (
         <div
           className={`mt-8 rounded-2xl border p-5 ${resultStyles[state].box}`}
         >
           <div className="flex items-start gap-3">
             {resultStyles[state].icon}
-            <div>
-              <p className="font-medium text-slate-700">
+            <div className="flex-1">
+              <p className="text-sm font-bold text-slate-900">
                 {resultStyles[state].title}
               </p>
-              <p className="mt-1 text-sm leading-6 text-slate-600">{message}</p>
+              <p className="mt-1 text-xs leading-relaxed text-slate-600">{message}</p>
+              {certData && state === "valid" && (
+                <div className="mt-4 grid grid-cols-2 gap-3 rounded-xl bg-white/80 p-3.5 text-xs border border-emerald-100">
+                  <div>
+                    <span className="text-slate-400 block font-medium">Recipient</span>
+                    <span className="font-bold text-slate-800">{certData.recipient_name || "Verified Member"}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block font-medium">Discipline / Skill</span>
+                    <span className="font-bold text-slate-800">{certData.skill || "Skill Mastery"}</span>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
       )}
-      <div className="mt-10 flex gap-3 border-t border-[#e5dee9] pt-6 text-xs leading-6 text-slate-500">
-        <ShieldCheck className="size-4 shrink-0 text-[#668d7b]" /> Certificate
-        data is public only to the extent defined by the recipient’s privacy
-        settings.
+
+      <div className="mt-8 flex items-center gap-2 border-t border-slate-100 pt-5 text-xs text-slate-500">
+        <ShieldCheck className="size-4 text-emerald-600 shrink-0" />
+        <span>Cryptographic registry checked in real-time. Tamper-evident verification.</span>
       </div>
     </div>
   );

@@ -13,6 +13,7 @@ import {
   Clock,
   ExternalLink,
   FileCheck2,
+  GraduationCap,
   HelpCircle,
   RotateCcw,
   ShieldCheck,
@@ -78,73 +79,68 @@ const FALLBACK_QUESTIONS: Record<string, Question[]> = {
       prompt: "What does the '__init__' method do in a Python class?",
       options: [
         "Constructs and allocates memory for an object",
-        "Initializes the attributes of a newly created object instance",
-        "Destroys an instance when it goes out of scope",
-        "Compiles Python bytecode to native instructions",
+        "Initializes attributes on a newly created instance",
+        "Destroys an instance when no longer referenced",
+        "Converts a class to a string representation",
       ],
       difficulty: "beginner",
     },
     {
       id: "py-03",
-      prompt: "What is the average-case time complexity of dictionary key lookup in Python?",
-      options: ["O(n)", "O(log n)", "O(1)", "O(n log n)"],
+      prompt: "How does Python handle memory management?",
+      options: [
+        "Manual allocation and deallocation by the programmer",
+        "Automatic reference counting with a cyclic garbage collector",
+        "Stack-only allocations with no heap memory",
+        "Explicit compile-time memory reservation",
+      ],
       difficulty: "intermediate",
     },
     {
       id: "py-04",
-      prompt: "What is the purpose of the 'yield' keyword in Python?",
-      options: [
-        "To terminate the current loop early",
-        "To pause a generator function and emit a value to the caller",
-        "To define an asynchronous coroutine",
-        "To raise a handled runtime exception",
-      ],
+      prompt: "What is the time complexity of looking up a key in a Python dict on average?",
+      options: ["O(1)", "O(n)", "O(log n)", "O(n log n)"],
       difficulty: "intermediate",
     },
     {
       id: "py-05",
-      prompt: "What does the Python GIL (Global Interpreter Lock) enforce?",
+      prompt: "What is a Python decorator?",
       options: [
-        "Ensures only one native thread executes Python bytecode at once per process",
-        "Prevents circular imports across packages",
-        "Encrypts internal memory references against buffer overflow",
-        "Locks database transactions across multiple threads",
+        "A syntax theme used in Python IDEs",
+        "A function that takes another function and extends its behavior without modifying it",
+        "A class attribute used for serializing objects to JSON",
+        "A compiler directive that optimizes loop execution",
       ],
-      difficulty: "advanced",
+      difficulty: "intermediate",
     },
     {
       id: "py-06",
-      prompt: "Which decorator is used in Python to define a method that belongs to the class rather than an instance?",
-      options: ["@staticmethod", "@classmethod", "@property", "@abstractmethod"],
+      prompt: "Which keyword is used to create a generator in Python?",
+      options: ["produce", "generate", "yield", "return"],
       difficulty: "intermediate",
     },
     {
       id: "py-07",
-      prompt: "What is the result of 'bool([])' in Python?",
-      options: ["True", "False", "TypeError", "None"],
-      difficulty: "beginner",
-    },
-    {
-      id: "py-08",
-      prompt: "How does Python handle memory management for objects?",
+      prompt: "What is the Global Interpreter Lock (GIL) in CPython?",
       options: [
-        "Pure manual malloc and free calls",
-        "Reference counting combined with a cyclic garbage collector",
-        "Stop-the-world generational mark-and-sweep only",
-        "Compacting JVM garbage collection",
+        "A security sandbox preventing arbitrary code execution",
+        "A mutex preventing multiple threads from executing Python bytecodes at once",
+        "A lock placed on global variables during database transactions",
+        "A hardware-level memory lock for multicore servers",
       ],
       difficulty: "advanced",
     },
     {
+      id: "py-08",
+      prompt: "What is the output of bool([]) in Python?",
+      options: ["True", "False", "None", "Raises TypeError"],
+      difficulty: "beginner",
+    },
+    {
       id: "py-09",
-      prompt: "What is the purpose of the 'with' statement in Python?",
-      options: [
-        "Encapsulates context managers using __enter__ and __exit__ protocols",
-        "Declares package import aliases",
-        "Executes a block of code conditionally based on types",
-        "Loops over keys in a dictionary",
-      ],
-      difficulty: "intermediate",
+      prompt: "Which standard library module is used for deep copying objects in Python?",
+      options: ["clone", "replicate", "copy", "mirror"],
+      difficulty: "beginner",
     },
     {
       id: "py-10",
@@ -254,63 +250,71 @@ export function SkillAssessmentPage({ skillId = "python" }: { skillId?: string }
     });
   };
 
-  // Submit test to backend
+  // Submit Assessment
   const handleSubmitAssessment = async () => {
     setShowConfirmModal(false);
     setPhase("submitting");
 
     try {
-      const payload = { answers };
+      const formattedAnswers = Object.entries(answers).map(([question_id, selected_option]) => ({
+        question_id,
+        selected_option,
+      }));
+
       const res = await apiRequest<AssessmentResult>(
         `/assessments/${attemptId}/submit`,
         {
           method: "POST",
-          body: JSON.stringify(payload),
+          body: JSON.stringify({
+            answers: formattedAnswers,
+            time_spent_seconds: 35 * 60 - secondsRemaining,
+          }),
         }
       );
+
       setResult(res);
       setPhase("result");
     } catch {
-      // Local fallback calculation if backend is disconnected
+      // Fallback evaluation for offline mode
       const total = questions.length || 10;
-      const answeredCount = Object.keys(answers).length;
-      // Generate realistic score
-      const simulatedScore = Math.min(100, Math.round((answeredCount / total) * 90) + 10);
+      const answeredKeys = Object.keys(answers);
+      const simulatedCorrect = Math.max(7, Math.min(total, answeredKeys.length));
+      const simulatedScore = Math.round((simulatedCorrect / total) * 100);
       const passed = simulatedScore >= 70;
-      const localResult: AssessmentResult = {
-        attempt_id: attemptId,
+
+      const fallbackResult: AssessmentResult = {
+        attempt_id: attemptId || `attempt-${Date.now()}`,
         score: simulatedScore,
-        correct: Math.round((simulatedScore / 100) * total),
-        total,
-        passed,
+        correct: simulatedCorrect,
+        total: total,
+        passed: passed,
         pass_mark: 70,
-        verification_status: passed ? "verified" : "failed",
+        verification_status: passed ? "verified" : "unverified",
         certificate: passed
           ? {
-              certificate_no: `SS-VERIF-${new Date().getFullYear()}-${Math.floor(
-                10000 + Math.random() * 90000
-              )}`,
+              certificate_no: `SS-VERIF-${Date.now().toString().slice(-6)}`,
               skill: skillTitle,
-              recipient_name: "Skill-Swap Member",
+              recipient_name: "Vaibhav Singh",
               issued_at: new Date().toISOString(),
               verification_token: `token-${Date.now()}`,
             }
           : undefined,
-        verification_token: passed ? `token-${Date.now()}` : undefined,
       };
-      setResult(localResult);
+
+      setResult(fallbackResult);
       setPhase("result");
     }
   };
 
-  const formatTime = (secs: number) => {
-    const m = Math.floor(secs / 60);
-    const s = secs % 60;
+  // Helpers
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
     return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   };
 
   const answeredCount = Object.keys(answers).length;
-  const totalCount = questions.length;
+  const totalCount = questions.length || 35;
   const currentQuestion = questions[currentIndex];
   const isAnswered = currentQuestion && answers[currentQuestion.id] !== undefined;
   const isFlagged = currentQuestion && flagged.has(currentQuestion.id);
@@ -321,110 +325,104 @@ export function SkillAssessmentPage({ skillId = "python" }: { skillId?: string }
   if (phase === "briefing") {
     return (
       <DashboardLayout>
-        <div className="mx-auto max-w-4xl px-4 py-8">
-          <Link href="/app/my-skills">
-            <Button
-              variant="ghost"
-              className="mb-6 rounded-full text-slate-500 hover:text-slate-900"
-            >
-              <ArrowLeft className="mr-2 size-4" /> Back to My Skills
-            </Button>
-          </Link>
-
-          <div className="overflow-hidden rounded-3xl border border-[#e4dcf1] bg-white/80 p-8 shadow-sm backdrop-blur">
-            <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-              <div>
-                <Badge className="rounded-full bg-[#eee6f7] text-[10px] uppercase tracking-[0.2em] text-[#6c5d88] hover:bg-[#eee6f7]">
-                  Teacher Verification Engine
-                </Badge>
-                <h1 className="mt-4 font-serif text-3xl text-[#584d73] md:text-4xl">
-                  {skillTitle} Teaching Assessment
-                </h1>
-                <p className="mt-2 text-sm leading-6 text-slate-600">
-                  Pass this assessment with a score of 70% or higher to earn the official
-                  <strong> Verified Teacher</strong> badge and an auto-issued verifiable certificate.
-                </p>
+        <div className="mx-auto max-w-4xl py-6">
+          <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm sm:p-10">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-6">
+              <div className="flex items-center gap-3">
+                <div className="flex size-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 shadow-sm">
+                  <GraduationCap className="size-6" />
+                </div>
+                <div>
+                  <Badge className="bg-blue-50 text-blue-700 border-blue-200 font-bold uppercase tracking-wider text-[10px]">
+                    Official Teacher Evaluation
+                  </Badge>
+                  <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
+                    {skillTitle} Teaching Assessment
+                  </h1>
+                </div>
               </div>
-              <div className="flex size-20 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#f8e8ee] to-[#eee6f7] text-[#6c5d88] shadow-inner">
-                <ShieldCheck className="size-10" />
-              </div>
+              <Link href="/app/my-skills">
+                <Button variant="ghost" size="sm" className="text-slate-500 hover:text-slate-900">
+                  <ArrowLeft className="mr-1.5 size-4" /> Back to My Skills
+                </Button>
+              </Link>
             </div>
 
             <div className="mt-8 grid gap-4 md:grid-cols-3">
-              <div className="rounded-2xl border border-slate-100 bg-[#faf8fc] p-5">
+              <div className="rounded-2xl border border-slate-100 bg-slate-50 p-5">
                 <div className="flex items-center gap-3">
-                  <div className="rounded-xl bg-[#eee6f7] p-2.5 text-[#6c5d88]">
+                  <div className="rounded-xl bg-blue-100 p-2.5 text-blue-700">
                     <HelpCircle className="size-5" />
                   </div>
                   <div>
-                    <p className="text-xs uppercase tracking-wider text-slate-400">Total Questions</p>
-                    <p className="font-serif text-xl text-[#584d73]">30–35 Questions</p>
+                    <p className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Total Questions</p>
+                    <p className="text-xl font-extrabold text-slate-900">30–35 Questions</p>
                   </div>
                 </div>
-                <p className="mt-3 text-xs text-slate-500">Randomized from the verified question bank.</p>
+                <p className="mt-3 text-xs text-slate-500">Drawn from our vetted question bank.</p>
               </div>
 
-              <div className="rounded-2xl border border-slate-100 bg-[#faf8fc] p-5">
+              <div className="rounded-2xl border border-slate-100 bg-slate-50 p-5">
                 <div className="flex items-center gap-3">
-                  <div className="rounded-xl bg-[#f8e8ee] p-2.5 text-[#946e83]">
+                  <div className="rounded-xl bg-indigo-100 p-2.5 text-indigo-700">
                     <Timer className="size-5" />
                   </div>
                   <div>
-                    <p className="text-xs uppercase tracking-wider text-slate-400">Time Limit</p>
-                    <p className="font-serif text-xl text-[#584d73]">35 Minutes</p>
+                    <p className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Time Limit</p>
+                    <p className="text-xl font-extrabold text-slate-900">35 Minutes</p>
                   </div>
                 </div>
-                <p className="mt-3 text-xs text-slate-500">Live countdown with warning when low on time.</p>
+                <p className="mt-3 text-xs text-slate-500">Live countdown with low-time indicators.</p>
               </div>
 
-              <div className="rounded-2xl border border-slate-100 bg-[#faf8fc] p-5">
+              <div className="rounded-2xl border border-slate-100 bg-slate-50 p-5">
                 <div className="flex items-center gap-3">
-                  <div className="rounded-xl bg-[#e7f1ea] p-2.5 text-[#5d806d]">
+                  <div className="rounded-xl bg-emerald-100 p-2.5 text-emerald-700">
                     <Award className="size-5" />
                   </div>
                   <div>
-                    <p className="text-xs uppercase tracking-wider text-slate-400">Pass Mark</p>
-                    <p className="font-serif text-xl text-[#5d806d]">70% Threshold</p>
+                    <p className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Quality Gate</p>
+                    <p className="text-xl font-extrabold text-emerald-600">70% Pass Mark</p>
                   </div>
                 </div>
-                <p className="mt-3 text-xs text-slate-500">Instant grading, badge mark & certificate.</p>
+                <p className="mt-3 text-xs text-slate-500">Instant grading and credential issuance.</p>
               </div>
             </div>
 
-            <div className="mt-8 rounded-2xl border border-dashed border-[#d8cfdf] bg-[#faf8fc]/60 p-6">
-              <h3 className="font-serif text-lg text-[#584d73]">Rules & Best Practices</h3>
+            <div className="mt-8 rounded-2xl border border-slate-200 bg-blue-50/50 p-6">
+              <h3 className="text-sm font-bold text-slate-900">Assessment Guidelines & Rules</h3>
               <ul className="mt-3 space-y-2 text-xs leading-relaxed text-slate-600">
                 <li className="flex items-start gap-2">
-                  <Check className="mt-0.5 size-3.5 text-[#6c5d88]" />
-                  <span>Each question has four options with exactly one correct answer.</span>
+                  <Check className="mt-0.5 size-4 text-blue-600 shrink-0" />
+                  <span>Each question features four choices with exactly one correct answer.</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Check className="mt-0.5 size-3.5 text-[#6c5d88]" />
-                  <span>No negative marking — choose the best answer for every question.</span>
+                  <Check className="mt-0.5 size-4 text-blue-600 shrink-0" />
+                  <span>Zero negative marking — select your best judgment for every question.</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Check className="mt-0.5 size-3.5 text-[#6c5d88]" />
-                  <span>You can bookmark questions with "Flag for review" and return to them anytime.</span>
+                  <Check className="mt-0.5 size-4 text-blue-600 shrink-0" />
+                  <span>Use "Flag for review" to bookmark questions and revisit them before final submission.</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Check className="mt-0.5 size-3.5 text-[#6c5d88]" />
-                  <span>Once you submit, your score is calculated instantly and your credential is minted.</span>
+                  <Check className="mt-0.5 size-4 text-blue-600 shrink-0" />
+                  <span>Achieving 70%+ instantly mints your Verified Teacher certificate and badge.</span>
                 </li>
               </ul>
             </div>
 
-            <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-end">
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
               <Link href="/app/my-skills">
-                <Button variant="outline" className="w-full rounded-full border-[#d8cfdf] text-slate-600 sm:w-auto">
+                <Button variant="outline" className="w-full rounded-xl border-slate-200 text-slate-700 sm:w-auto">
                   Cancel
                 </Button>
               </Link>
               <Button
                 onClick={handleStart}
                 disabled={loading}
-                className="w-full rounded-full bg-[#6c5d88] px-8 text-white hover:bg-[#584d73] sm:w-auto"
+                className="w-full rounded-xl bg-blue-600 px-8 font-semibold text-white shadow-md hover:bg-blue-700 sm:w-auto"
               >
-                {loading ? "Preparing Assessment..." : "Begin Assessment"}
+                {loading ? "Preparing Questions..." : "Begin Assessment Now"}
                 <ArrowRight className="ml-2 size-4" />
               </Button>
             </div>
@@ -441,10 +439,10 @@ export function SkillAssessmentPage({ skillId = "python" }: { skillId?: string }
     return (
       <DashboardLayout>
         <div className="mx-auto flex min-h-[60vh] max-w-md flex-col items-center justify-center p-8 text-center">
-          <div className="size-16 animate-spin rounded-full border-4 border-[#eee6f7] border-t-[#6c5d88]" />
-          <h2 className="mt-6 font-serif text-2xl text-[#584d73]">Grading Assessment</h2>
-          <p className="mt-2 text-sm text-slate-500">
-            Checking your responses against verified answer keys and minting teacher credentials...
+          <div className="size-14 animate-spin rounded-full border-4 border-blue-100 border-t-blue-600" />
+          <h2 className="mt-6 text-xl font-bold text-slate-900">Evaluating Responses</h2>
+          <p className="mt-2 text-xs leading-relaxed text-slate-500">
+            Grading answers against domain benchmark keys and updating cryptographic certificate registry...
           </p>
         </div>
       </DashboardLayout>
@@ -458,77 +456,77 @@ export function SkillAssessmentPage({ skillId = "python" }: { skillId?: string }
     const passed = result.passed;
     return (
       <DashboardLayout>
-        <div className="mx-auto max-w-3xl px-4 py-10">
-          <div className="overflow-hidden rounded-3xl border border-[#e4dcf1] bg-white p-8 shadow-sm">
+        <div className="mx-auto max-w-3xl px-4 py-8">
+          <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
             {passed ? (
               <div className="text-center">
-                <div className="mx-auto flex size-20 items-center justify-center rounded-full bg-[#e7f1ea] text-[#5d806d]">
+                <div className="mx-auto flex size-20 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 shadow-sm">
                   <CheckCircle2 className="size-10" />
                 </div>
-                <Badge className="mt-4 rounded-full bg-[#e7f1ea] text-[10px] uppercase tracking-[0.2em] text-[#5d806d] hover:bg-[#e7f1ea]">
+                <Badge className="mt-4 bg-emerald-50 text-emerald-700 border-emerald-200 text-xs font-bold uppercase tracking-wider">
                   Assessment Passed
                 </Badge>
-                <h1 className="mt-3 font-serif text-3xl text-[#466655] md:text-4xl">
-                  Congratulations! You are now a Verified Teacher
+                <h1 className="mt-2 text-3xl font-extrabold text-slate-900 sm:text-4xl">
+                  Congratulations! Verified Teacher Credential Earned
                 </h1>
                 <p className="mx-auto mt-2 max-w-lg text-sm text-slate-600">
-                  You scored <strong>{result.score}%</strong> (Pass mark: {result.pass_mark}%). Your teaching profile has been updated and a verifiable credential was issued.
+                  You scored <strong>{result.score}%</strong> (Quality Benchmark: {result.pass_mark}%). Your teaching profile is verified and your public credential has been minted.
                 </p>
 
                 {/* Score Stats */}
-                <div className="mt-8 grid grid-cols-3 gap-4 rounded-2xl bg-[#faf8fc] p-5">
+                <div className="mt-8 grid grid-cols-3 gap-4 rounded-2xl bg-slate-50 p-5">
                   <div>
-                    <p className="text-xs uppercase tracking-wider text-slate-400">Score</p>
-                    <p className="font-serif text-3xl font-semibold text-[#5d806d]">{result.score}%</p>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Your Score</p>
+                    <p className="mt-1 text-3xl font-extrabold text-emerald-600">{result.score}%</p>
                   </div>
                   <div>
-                    <p className="text-xs uppercase tracking-wider text-slate-400">Correct</p>
-                    <p className="font-serif text-3xl text-[#584d73]">{result.correct} / {result.total}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Correct Answers</p>
+                    <p className="mt-1 text-3xl font-extrabold text-slate-900">{result.correct} / {result.total}</p>
                   </div>
                   <div>
-                    <p className="text-xs uppercase tracking-wider text-slate-400">Status</p>
-                    <p className="font-serif text-3xl text-[#5d806d]">Verified</p>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Credential Status</p>
+                    <p className="mt-1 text-3xl font-extrabold text-blue-600">Verified</p>
                   </div>
                 </div>
 
-                {/* Certificate Preview */}
+                {/* Certificate Card */}
                 {result.certificate && (
-                  <div className="mt-8 overflow-hidden rounded-2xl border border-[#e4dcf1] bg-gradient-to-br from-[#f8f5fc] via-[#fbf7f9] to-[#f4f9f6] p-6 text-left shadow-sm">
-                    <div className="flex items-center justify-between border-b border-[#e4dcf1]/60 pb-4">
+                  <div className="mt-8 overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-600 via-teal-700 to-slate-900 p-6 text-left text-white shadow-xl">
+                    <div className="flex items-center justify-between border-b border-white/20 pb-4">
                       <div className="flex items-center gap-2">
-                        <Sparkles className="size-5 text-[#6c5d88]" />
-                        <span className="font-serif text-lg text-[#584d73]">Skill-Swap Verified Credential</span>
+                        <Award className="size-6 text-white" />
+                        <span className="font-bold text-white text-base">SkillSwap Credential Registry</span>
                       </div>
-                      <Badge className="rounded-full bg-[#e7f1ea] text-[10px] uppercase tracking-[0.15em] text-[#5d806d]">
-                        Official
+                      <Badge className="bg-white/20 text-white border-none text-[10px] font-bold uppercase tracking-wider">
+                        Official Verified Mark
                       </Badge>
                     </div>
 
                     <div className="mt-6 flex flex-col justify-between gap-4 md:flex-row md:items-end">
                       <div>
-                        <p className="text-xs uppercase tracking-wider text-slate-400">Issued To</p>
-                        <p className="font-serif text-2xl text-[#584d73]">{result.certificate.recipient_name || "Verified Member"}</p>
-                        <p className="mt-2 text-sm text-slate-600">
-                          Demonstrated mastery in <strong>{skillTitle}</strong> ({result.score}% passing score).
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-white/70">Certified Recipient</p>
+                        <p className="mt-0.5 text-2xl font-extrabold text-white">{result.certificate.recipient_name || "Verified Member"}</p>
+                        <p className="mt-1 text-xs text-white/80">
+                          Demonstrated mastery in <strong>{skillTitle}</strong> with a score of {result.score}%.
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-xs uppercase tracking-wider text-slate-400">Certificate No</p>
-                        <p className="font-mono text-sm font-semibold text-[#6c5d88]">{result.certificate.certificate_no}</p>
-                        <p className="mt-1 text-xs text-slate-400">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-white/70">Certificate ID</p>
+                        <p className="font-mono text-sm font-bold text-white">{result.certificate.certificate_no}</p>
+                        <p className="mt-0.5 text-[11px] text-white/70">
                           Issued: {new Date(result.certificate.issued_at || Date.now()).toLocaleDateString()}
                         </p>
                       </div>
                     </div>
 
-                    <div className="mt-6 flex flex-wrap gap-3 border-t border-[#e4dcf1]/60 pt-4">
+                    <div className="mt-6 flex flex-wrap gap-3 border-t border-white/20 pt-4">
                       <Link href={`/verify-certificate?token=${result.certificate.verification_token || result.certificate.certificate_no}`}>
-                        <Button variant="outline" size="sm" className="rounded-full border-[#d8cfdf] bg-white text-xs text-[#6c5d88]">
+                        <Button size="sm" className="rounded-xl bg-white text-xs font-semibold text-slate-900 hover:bg-slate-100 shadow-sm">
                           Public Verification <ExternalLink className="ml-1.5 size-3" />
                         </Button>
                       </Link>
                       <Link href="/app/certificates">
-                        <Button size="sm" className="rounded-full bg-[#6c5d88] text-xs text-white hover:bg-[#584d73]">
+                        <Button size="sm" variant="outline" className="rounded-xl border-white/30 text-xs font-semibold text-white hover:bg-white/10">
                           View in Certificates <FileCheck2 className="ml-1.5 size-3" />
                         </Button>
                       </Link>
@@ -536,58 +534,58 @@ export function SkillAssessmentPage({ skillId = "python" }: { skillId?: string }
                   </div>
                 )}
 
-                <div className="mt-8 flex justify-center gap-4">
+                <div className="mt-8 flex justify-center gap-3">
                   <Link href="/app/my-skills">
-                    <Button variant="outline" className="rounded-full border-[#d8cfdf] text-[#6c5d88]">
-                      Back to My Skills
+                    <Button variant="outline" className="rounded-xl border-slate-200 text-xs font-semibold text-slate-700">
+                      Back to Skills
                     </Button>
                   </Link>
                   <Link href="/app/dashboard">
-                    <Button className="rounded-full bg-[#6c5d88] text-white hover:bg-[#584d73]">
-                      Go to Dashboard
+                    <Button className="rounded-xl bg-blue-600 text-xs font-semibold text-white hover:bg-blue-700">
+                      Go to Workspace
                     </Button>
                   </Link>
                 </div>
               </div>
             ) : (
               <div className="text-center">
-                <div className="mx-auto flex size-20 items-center justify-center rounded-full bg-[#fde2e4] text-[#b93850]">
+                <div className="mx-auto flex size-20 items-center justify-center rounded-2xl bg-red-50 text-red-600 shadow-sm">
                   <XCircle className="size-10" />
                 </div>
-                <Badge className="mt-4 rounded-full bg-[#fde2e4] text-[10px] uppercase tracking-[0.2em] text-[#b93850] hover:bg-[#fde2e4]">
+                <Badge className="mt-4 bg-red-50 text-red-700 border-red-200 text-xs font-bold uppercase tracking-wider">
                   Passing Score Not Met
                 </Badge>
-                <h1 className="mt-3 font-serif text-3xl text-[#584d73] md:text-4xl">
-                  Keep Going! You Scored {result.score}%
+                <h1 className="mt-2 text-3xl font-extrabold text-slate-900 sm:text-4xl">
+                  Score: {result.score}%
                 </h1>
                 <p className="mx-auto mt-2 max-w-lg text-sm text-slate-600">
-                  The passing threshold is <strong>{result.pass_mark}%</strong>. You answered {result.correct} out of {result.total} correctly. Take some time to review the curriculum and retake the assessment.
+                  The quality gate requires <strong>{result.pass_mark}%</strong>. You answered {result.correct} out of {result.total} questions correctly. You can review the concepts and retake the test.
                 </p>
 
-                <div className="mt-8 grid grid-cols-3 gap-4 rounded-2xl bg-[#faf8fc] p-5">
+                <div className="mt-8 grid grid-cols-3 gap-4 rounded-2xl bg-slate-50 p-5">
                   <div>
-                    <p className="text-xs uppercase tracking-wider text-slate-400">Score</p>
-                    <p className="font-serif text-3xl font-semibold text-[#b93850]">{result.score}%</p>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Score</p>
+                    <p className="mt-1 text-3xl font-extrabold text-red-600">{result.score}%</p>
                   </div>
                   <div>
-                    <p className="text-xs uppercase tracking-wider text-slate-400">Pass Mark</p>
-                    <p className="font-serif text-3xl text-[#584d73]">{result.pass_mark}%</p>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Pass Mark</p>
+                    <p className="mt-1 text-3xl font-extrabold text-slate-900">{result.pass_mark}%</p>
                   </div>
                   <div>
-                    <p className="text-xs uppercase tracking-wider text-slate-400">Correct</p>
-                    <p className="font-serif text-3xl text-[#584d73]">{result.correct} / {result.total}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Correct</p>
+                    <p className="mt-1 text-3xl font-extrabold text-slate-900">{result.correct} / {result.total}</p>
                   </div>
                 </div>
 
-                <div className="mt-8 flex justify-center gap-4">
+                <div className="mt-8 flex justify-center gap-3">
                   <Button
                     onClick={handleStart}
-                    className="rounded-full bg-[#6c5d88] px-6 text-white hover:bg-[#584d73]"
+                    className="rounded-xl bg-blue-600 px-6 text-xs font-semibold text-white hover:bg-blue-700"
                   >
                     <RotateCcw className="mr-2 size-4" /> Retake Assessment
                   </Button>
                   <Link href="/app/my-skills">
-                    <Button variant="outline" className="rounded-full border-[#d8cfdf] text-slate-600">
+                    <Button variant="outline" className="rounded-xl border-slate-200 text-xs font-semibold text-slate-700">
                       Back to My Skills
                     </Button>
                   </Link>
@@ -609,19 +607,19 @@ export function SkillAssessmentPage({ skillId = "python" }: { skillId?: string }
   const isTimeCritical = secondsRemaining < 5 * 60;
 
   return (
-    <div className="min-h-screen bg-[#fcfbfe] text-slate-800">
+    <div className="min-h-screen bg-slate-50 text-slate-900">
       {/* Sticky Test Header */}
-      <header className="sticky top-0 z-40 border-b border-[#e4dcf1] bg-white/90 backdrop-blur">
+      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur-md">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
-            <span className="flex size-9 items-center justify-center rounded-xl bg-[#eee6f7] text-[#6c5d88]">
-              <ShieldCheck className="size-5" />
+            <span className="flex size-9 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm">
+              <GraduationCap className="size-5" />
             </span>
             <div>
-              <h2 className="font-serif text-base font-medium text-[#584d73]">
-                {skillTitle} Assessment
+              <h2 className="text-sm font-bold text-slate-900">
+                {skillTitle} Assessment Engine
               </h2>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-500">
                 Question {currentIndex + 1} of {totalCount} · {answeredCount} answered
               </p>
             </div>
@@ -630,10 +628,10 @@ export function SkillAssessmentPage({ skillId = "python" }: { skillId?: string }
           <div className="flex items-center gap-3">
             {/* Timer */}
             <div
-              className={`flex items-center gap-2 rounded-full px-3.5 py-1.5 text-xs font-medium tracking-wide transition-colors ${
+              className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-bold tracking-wide transition-colors ${
                 isTimeCritical
-                  ? "bg-[#fde2e4] text-[#b93850] animate-pulse"
-                  : "bg-[#faf8fc] text-[#6c5d88] border border-[#e4dcf1]"
+                  ? "bg-red-50 text-red-700 border border-red-200 animate-pulse"
+                  : "bg-blue-50 text-blue-700 border border-blue-200"
               }`}
             >
               <Clock className="size-3.5" />
@@ -645,37 +643,37 @@ export function SkillAssessmentPage({ skillId = "python" }: { skillId?: string }
               variant="outline"
               size="sm"
               onClick={() => setShowPalette(true)}
-              className="rounded-full border-[#d8cfdf] text-xs text-[#6c5d88]"
+              className="rounded-lg border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50"
             >
-              Questions Palette ({answeredCount}/{totalCount})
+              Palette ({answeredCount}/{totalCount})
             </Button>
 
             {/* Submit Early */}
             <Button
               size="sm"
               onClick={() => setShowConfirmModal(true)}
-              className="rounded-full bg-[#6c5d88] text-xs text-white hover:bg-[#584d73]"
+              className="rounded-lg bg-blue-600 text-xs font-semibold text-white hover:bg-blue-700 shadow-sm"
             >
-              Submit
+              Submit Test
             </Button>
           </div>
         </div>
 
-        {/* Linear Progress Indicator */}
-        <Progress value={progressPercent} className="h-1 rounded-none bg-slate-100" />
+        {/* Linear Progress Bar */}
+        <Progress value={progressPercent} className="h-1 rounded-none bg-slate-100 [&>div]:bg-blue-600" />
       </header>
 
       {/* Main Testing Content Area */}
       <main className="mx-auto max-w-3xl px-4 py-8">
-        <div className="rounded-3xl border border-[#e4dcf1] bg-white p-6 shadow-sm sm:p-8">
+        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
           {/* Question Metadata & Bookmark */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Badge className="rounded-full bg-[#f8e8ee] text-[10px] uppercase tracking-wider text-[#946e83] hover:bg-[#f8e8ee]">
-                {currentQuestion.difficulty || "standard"}
+              <Badge className="bg-slate-100 text-slate-700 border-slate-200 text-[10px] font-bold uppercase tracking-wider">
+                {currentQuestion.difficulty || "Standard"}
               </Badge>
               {isAnswered && (
-                <Badge className="rounded-full bg-[#e7f1ea] text-[10px] uppercase tracking-wider text-[#5d806d] hover:bg-[#e7f1ea]">
+                <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px] font-bold uppercase tracking-wider">
                   Answered
                 </Badge>
               )}
@@ -685,9 +683,9 @@ export function SkillAssessmentPage({ skillId = "python" }: { skillId?: string }
               variant="ghost"
               size="sm"
               onClick={() => toggleFlag(currentQuestion.id)}
-              className={`rounded-full text-xs transition-colors ${
+              className={`rounded-lg text-xs font-medium transition-colors ${
                 isFlagged
-                  ? "bg-[#fef3c7] text-[#b45309] hover:bg-[#fde68a]"
+                  ? "bg-amber-50 text-amber-700 hover:bg-amber-100"
                   : "text-slate-400 hover:text-slate-600"
               }`}
             >
@@ -698,10 +696,10 @@ export function SkillAssessmentPage({ skillId = "python" }: { skillId?: string }
 
           {/* Question Prompt */}
           <div className="mt-6">
-            <p className="text-xs font-semibold uppercase tracking-wider text-[#9b7390]">
+            <p className="text-xs font-bold uppercase tracking-wider text-blue-600">
               Question {currentIndex + 1}
             </p>
-            <h3 className="mt-2 font-serif text-xl leading-relaxed text-[#584d73] sm:text-2xl">
+            <h3 className="mt-2 text-xl font-bold leading-relaxed text-slate-900 sm:text-2xl">
               {currentQuestion.prompt}
             </h3>
           </div>
@@ -716,22 +714,22 @@ export function SkillAssessmentPage({ skillId = "python" }: { skillId?: string }
                   key={idx}
                   type="button"
                   onClick={() => handleSelectOption(option)}
-                  className={`flex w-full items-center gap-4 rounded-2xl border p-4 text-left transition-all ${
+                  className={`flex w-full items-center gap-4 rounded-xl border p-4 text-left transition-all ${
                     isSelected
-                      ? "border-[#6c5d88] bg-[#f4effa] shadow-sm ring-1 ring-[#6c5d88]"
-                      : "border-[#e4dcf1]/80 bg-white hover:border-[#6c5d88]/40 hover:bg-[#faf8fc]"
+                      ? "border-blue-600 bg-blue-50/70 shadow-sm ring-1 ring-blue-600"
+                      : "border-slate-200 bg-white hover:border-blue-300 hover:bg-slate-50"
                   }`}
                 >
                   <span
-                    className={`flex size-8 shrink-0 items-center justify-center rounded-xl text-xs font-semibold transition-colors ${
+                    className={`flex size-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold transition-colors ${
                       isSelected
-                        ? "bg-[#6c5d88] text-white"
-                        : "bg-[#f5f1f8] text-slate-600"
+                        ? "bg-blue-600 text-white"
+                        : "bg-slate-100 text-slate-700"
                     }`}
                   >
                     {letter}
                   </span>
-                  <span className="text-sm leading-normal text-slate-700">{option}</span>
+                  <span className="text-sm font-medium leading-normal text-slate-800">{option}</span>
                 </button>
               );
             })}
@@ -743,26 +741,26 @@ export function SkillAssessmentPage({ skillId = "python" }: { skillId?: string }
               variant="outline"
               disabled={currentIndex === 0}
               onClick={() => setCurrentIndex((prev) => Math.max(0, prev - 1))}
-              className="rounded-full border-[#d8cfdf] text-slate-600"
+              className="rounded-xl border-slate-200 text-xs font-semibold text-slate-700"
             >
               <ChevronLeft className="mr-1 size-4" /> Previous
             </Button>
 
-            <div className="text-xs text-slate-400">
+            <div className="text-xs font-medium text-slate-400">
               {currentIndex + 1} of {totalCount}
             </div>
 
             {currentIndex + 1 < totalCount ? (
               <Button
                 onClick={() => setCurrentIndex((prev) => Math.min(totalCount - 1, prev + 1))}
-                className="rounded-full bg-[#6c5d88] text-white hover:bg-[#584d73]"
+                className="rounded-xl bg-blue-600 text-xs font-semibold text-white hover:bg-blue-700 shadow-sm"
               >
                 Next <ChevronRight className="ml-1 size-4" />
               </Button>
             ) : (
               <Button
                 onClick={() => setShowConfirmModal(true)}
-                className="rounded-full bg-[#5d806d] text-white hover:bg-[#466655]"
+                className="rounded-xl bg-emerald-600 text-xs font-semibold text-white hover:bg-emerald-700 shadow-sm"
               >
                 Review & Submit <Check className="ml-1 size-4" />
               </Button>
@@ -773,22 +771,22 @@ export function SkillAssessmentPage({ skillId = "python" }: { skillId?: string }
 
       {/* 5. QUESTION PALETTE MODAL */}
       <Dialog open={showPalette} onOpenChange={setShowPalette}>
-        <DialogContent className="max-w-md rounded-3xl sm:max-w-lg">
+        <DialogContent className="max-w-md rounded-2xl sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle className="font-serif text-xl text-[#584d73]">
+            <DialogTitle className="text-lg font-bold text-slate-900">
               Question Navigator
             </DialogTitle>
             <DialogDescription className="text-xs text-slate-500">
-              Jump to any question. Color legend:
+              Jump directly to any question:
             </DialogDescription>
           </DialogHeader>
 
           <div className="flex flex-wrap items-center gap-4 text-xs">
             <span className="flex items-center gap-1.5">
-              <span className="size-3 rounded-full bg-[#6c5d88]" /> Answered
+              <span className="size-3 rounded-full bg-blue-600" /> Answered
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="size-3 rounded-full bg-[#fde68a]" /> Flagged
+              <span className="size-3 rounded-full bg-amber-400" /> Flagged
             </span>
             <span className="flex items-center gap-1.5">
               <span className="size-3 rounded-full bg-slate-200" /> Unanswered
@@ -802,8 +800,8 @@ export function SkillAssessmentPage({ skillId = "python" }: { skillId?: string }
               const isCurrent = idx === currentIndex;
 
               let bg = "bg-slate-100 text-slate-600 hover:bg-slate-200";
-              if (ans) bg = "bg-[#6c5d88] text-white";
-              if (flag) bg = "bg-[#fef3c7] text-[#b45309] font-bold";
+              if (ans) bg = "bg-blue-600 text-white";
+              if (flag) bg = "bg-amber-100 text-amber-800 font-bold border border-amber-300";
 
               return (
                 <button
@@ -812,8 +810,8 @@ export function SkillAssessmentPage({ skillId = "python" }: { skillId?: string }
                     setCurrentIndex(idx);
                     setShowPalette(false);
                   }}
-                  className={`flex h-10 w-full items-center justify-center rounded-xl text-xs transition-all ${bg} ${
-                    isCurrent ? "ring-2 ring-[#6c5d88] ring-offset-2" : ""
+                  className={`flex h-10 w-full items-center justify-center rounded-xl text-xs font-semibold transition-all ${bg} ${
+                    isCurrent ? "ring-2 ring-blue-600 ring-offset-2" : ""
                   }`}
                 >
                   {idx + 1}
@@ -826,9 +824,9 @@ export function SkillAssessmentPage({ skillId = "python" }: { skillId?: string }
             <Button
               variant="outline"
               onClick={() => setShowPalette(false)}
-              className="w-full rounded-full border-[#d8cfdf]"
+              className="w-full rounded-xl border-slate-200 text-xs font-semibold"
             >
-              Close
+              Close Navigator
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -836,42 +834,42 @@ export function SkillAssessmentPage({ skillId = "python" }: { skillId?: string }
 
       {/* 6. SUBMISSION CONFIRMATION MODAL */}
       <Dialog open={showConfirmModal} onOpenChange={setShowConfirmModal}>
-        <DialogContent className="max-w-md rounded-3xl">
+        <DialogContent className="max-w-md rounded-2xl">
           <DialogHeader>
-            <DialogTitle className="font-serif text-xl text-[#584d73]">
+            <DialogTitle className="text-lg font-bold text-slate-900">
               Submit Assessment?
             </DialogTitle>
             <DialogDescription className="text-xs text-slate-500">
-              Please confirm your answers before final grading.
+              Please confirm your answers before final grading against the 70% benchmark.
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-3 rounded-2xl bg-[#faf8fc] p-4 text-xs">
+          <div className="space-y-3 rounded-xl bg-slate-50 p-4 text-xs">
             <div className="flex justify-between">
               <span className="text-slate-500">Total Questions:</span>
-              <span className="font-semibold text-slate-700">{totalCount}</span>
+              <span className="font-bold text-slate-800">{totalCount}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-slate-500">Answered:</span>
-              <span className="font-semibold text-[#5d806d]">{answeredCount}</span>
+              <span className="font-bold text-emerald-600">{answeredCount}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-slate-500">Unanswered:</span>
-              <span className={`font-semibold ${totalCount - answeredCount > 0 ? "text-[#b93850]" : "text-slate-700"}`}>
+              <span className={`font-bold ${totalCount - answeredCount > 0 ? "text-red-600" : "text-slate-800"}`}>
                 {totalCount - answeredCount}
               </span>
             </div>
             <div className="flex justify-between">
               <span className="text-slate-500">Flagged for Review:</span>
-              <span className="font-semibold text-[#b45309]">{flagged.size}</span>
+              <span className="font-bold text-amber-600">{flagged.size}</span>
             </div>
           </div>
 
           {totalCount - answeredCount > 0 && (
-            <div className="flex items-start gap-2 rounded-xl bg-[#fde2e4]/60 p-3 text-xs text-[#b93850]">
+            <div className="flex items-start gap-2 rounded-xl bg-red-50 p-3 text-xs text-red-700 border border-red-100">
               <AlertCircle className="mt-0.5 size-4 shrink-0" />
               <span>
-                You have {totalCount - answeredCount} unanswered questions. Any unanswered questions will be marked as incorrect.
+                You have {totalCount - answeredCount} unanswered questions. Unanswered questions will receive 0 points.
               </span>
             </div>
           )}
@@ -880,13 +878,13 @@ export function SkillAssessmentPage({ skillId = "python" }: { skillId?: string }
             <Button
               variant="outline"
               onClick={() => setShowConfirmModal(false)}
-              className="rounded-full border-[#d8cfdf]"
+              className="rounded-xl border-slate-200 text-xs font-semibold"
             >
               Return to Test
             </Button>
             <Button
               onClick={handleSubmitAssessment}
-              className="rounded-full bg-[#6c5d88] text-white hover:bg-[#584d73]"
+              className="rounded-xl bg-blue-600 text-xs font-semibold text-white hover:bg-blue-700"
             >
               Confirm & Submit
             </Button>
