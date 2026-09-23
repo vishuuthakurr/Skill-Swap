@@ -30,8 +30,11 @@ class RegisterView(APIView):
             return Response({"detail": "If this email can be used, a verification message will be sent."}, status=202)
         user = {"id": secrets.token_urlsafe(16), "email": email, "name": name, "password_hash": hash_password(password), "role": "user", "status": "pending_email", "email_verified": False, "created_at": datetime.now(timezone.utc)}
         db.users.insert_one(user)
-        issue_otp(email)
-        return Response({"message": "Verification code sent.", "email": email}, status=201)
+        otp = issue_otp(email)
+        res_data = {"message": "Verification code sent.", "email": email}
+        if settings.DEBUG:
+            res_data["dev_otp"] = otp
+        return Response(res_data, status=201)
 
 
 class VerifyOtpView(APIView):

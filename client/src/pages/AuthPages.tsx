@@ -267,8 +267,12 @@ export function Register() {
             setError("");
             setLoading(true);
             try {
-              await registerAccount({ name, email, password });
-              setLocation(`/verify-email?email=${encodeURIComponent(email)}`);
+              const res = await registerAccount({ name, email, password });
+              const query = new URLSearchParams({ email });
+              if (res.dev_otp) {
+                query.set("dev_otp", res.dev_otp);
+              }
+              setLocation(`/verify-email?${query.toString()}`);
             } catch (caught) {
               setError(
                 caught instanceof Error
@@ -356,12 +360,13 @@ export function Register() {
 }
 
 export function VerifyEmail() {
-  const [code, setCode] = useState("");
+  const searchParams = new URLSearchParams(window.location.search);
+  const email = searchParams.get("email") || "your email";
+  const devOtp = searchParams.get("dev_otp") || "";
+  const [code, setCode] = useState(devOtp);
   const [verified, setVerified] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const email =
-    new URLSearchParams(window.location.search).get("email") || "your email";
 
   return (
     <AuthShell eyebrow="Security Check">
@@ -377,6 +382,21 @@ export function VerifyEmail() {
           <p className="mt-1.5 text-xs text-slate-500 leading-relaxed">
             Enter the 6-digit code sent to <strong className="text-slate-800">{email}</strong>.
           </p>
+          {devOtp && (
+            <div className="mt-3 flex items-center justify-between rounded-xl border border-blue-200 bg-blue-50/80 px-3.5 py-2.5 text-xs text-blue-900">
+              <span>
+                <strong className="text-blue-700">Dev OTP Code:</strong>{" "}
+                <code className="font-mono font-bold tracking-wider">{devOtp}</code>
+              </span>
+              <button
+                type="button"
+                onClick={() => setCode(devOtp)}
+                className="font-semibold text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
+              >
+                Auto-fill
+              </button>
+            </div>
+          )}
         </div>
 
         {verified ? (

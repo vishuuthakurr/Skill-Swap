@@ -7,12 +7,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 try:
     from dotenv import load_dotenv
     load_dotenv(BASE_DIR / ".env")
+    load_dotenv(BASE_DIR.parent / ".env")
 except Exception:
     pass
 
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "development-only-change-me")
 DEBUG = os.environ.get("DJANGO_DEBUG", "true").lower() == "true"
-ALLOWED_HOSTS = [host.strip() for host in os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,testserver").split(",") if host.strip()]
+allowed_hosts = [host.strip() for host in os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if host.strip()]
+if "testserver" not in allowed_hosts:
+    allowed_hosts.append("testserver")
+ALLOWED_HOSTS = allowed_hosts
 
 INSTALLED_APPS = [
     "django.contrib.auth",
@@ -64,7 +68,29 @@ REST_FRAMEWORK = {
     "EXCEPTION_HANDLER": "api.errors.api_exception_handler",
 }
 
-CORS_ALLOWED_ORIGINS = [origin.strip() for origin in os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:5173").split(",") if origin.strip()]
+CORS_ALLOW_CREDENTIALS = True
+cors_defaults = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+]
+env_origins = [origin.strip() for origin in os.environ.get("CORS_ALLOWED_ORIGINS", "").split(",") if origin.strip()]
+CORS_ALLOWED_ORIGINS = list(dict.fromkeys(cors_defaults + env_origins))
+CSRF_TRUSTED_ORIGINS = list(CORS_ALLOWED_ORIGINS)
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+]
 
 MONGODB_URI = os.environ.get("MONGODB_URI", "mongodb://localhost:27017")
 MONGODB_DATABASE = os.environ.get("MONGODB_DATABASE", "skill_swap")

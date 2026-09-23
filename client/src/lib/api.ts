@@ -13,15 +13,39 @@ export async function apiRequest<T>(
       : null;
   const isMultipart =
     typeof FormData !== "undefined" && init.body instanceof FormData;
-  const response = await fetch(`${baseUrl}${path}`, {
-    ...init,
-    credentials: "include",
-    headers: {
-      ...(isMultipart ? {} : { "Content-Type": "application/json" }),
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(init.headers || {}),
-    },
-  });
+  const requestHeaders = {
+    ...(isMultipart ? {} : { "Content-Type": "application/json" }),
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(init.headers || {}),
+  };
+
+  let response: Response;
+  try {
+    response = await fetch(`${baseUrl}${path}`, {
+      ...init,
+      credentials: "include",
+      headers: requestHeaders,
+    });
+  } catch (_err) {
+    if (baseUrl.startsWith("http")) {
+      try {
+        response = await fetch(`/api/v1${path}`, {
+          ...init,
+          credentials: "include",
+          headers: requestHeaders,
+        });
+      } catch {
+        throw new Error(
+          "Network error: Unable to connect to the backend server. Please verify the API is running."
+        );
+      }
+    } else {
+      throw new Error(
+        "Network error: Unable to connect to the backend server. Please verify the API is running."
+      );
+    }
+  }
+
   const payload = (await response.json().catch(() => ({}))) as T & ApiError;
   if (!response.ok)
     throw new Error(
@@ -37,7 +61,9 @@ export function registerAccount(input: {
   email: string;
   password: string;
 }) {
-  return apiRequest<{ message: string; email: string }>("/auth/register", {
+  return apiRequest<{ message: string; email: string; dev_otp?: string }>(
+    "/auth/register",
+    {
     method: "POST",
     body: JSON.stringify(input),
   });
