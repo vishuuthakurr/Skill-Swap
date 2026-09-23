@@ -125,12 +125,13 @@ export default function DashboardLayout({
           <p className="mt-2 text-sm text-slate-500">
             Access your courses, swaps, assessments, and verified credentials.
           </p>
-          <Button
-            onClick={() => startLogin()}
-            className="mt-6 w-full rounded-lg bg-blue-600 py-2.5 font-semibold text-white shadow-sm hover:bg-blue-700"
-          >
-            Sign In
-          </Button>
+          <Link href="/login">
+            <Button
+              className="mt-6 w-full rounded-lg bg-blue-600 py-2.5 font-semibold text-white shadow-sm hover:bg-blue-700"
+            >
+              Sign In
+            </Button>
+          </Link>
         </div>
       </div>
     );

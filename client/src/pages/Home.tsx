@@ -327,12 +327,13 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <Button
-                    onClick={() => startLogin()}
-                    className="w-full rounded-xl bg-blue-600 py-3 font-semibold text-white shadow-md shadow-blue-500/20 hover:bg-blue-700"
-                  >
-                    Start Swap with Aarav <ArrowRight className="ml-2 size-4" />
-                  </Button>
+                  <Link href="/login">
+                    <Button
+                      className="w-full rounded-xl bg-blue-600 py-3 font-semibold text-white shadow-md shadow-blue-500/20 hover:bg-blue-700"
+                    >
+                      Start Swap with Aarav <ArrowRight className="ml-2 size-4" />
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -522,13 +523,14 @@ export default function Home() {
                       Verify a Certificate <ArrowUpRight className="ml-2 size-4" />
                     </Button>
                   </Link>
-                  <Button
-                    onClick={() => startLogin()}
-                    variant="outline"
-                    className="rounded-xl border-slate-700 text-white bg-white/10 hover:bg-white/20"
-                  >
-                    Take Practice Assessment
-                  </Button>
+                  <Link href="/app/assessments/python">
+                    <Button
+                      variant="outline"
+                      className="rounded-xl border-slate-700 text-white bg-white/10 hover:bg-white/20"
+                    >
+                      Take Practice Assessment
+                    </Button>
+                  </Link>
                 </div>
               </div>
 

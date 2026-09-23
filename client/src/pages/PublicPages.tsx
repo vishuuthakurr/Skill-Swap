@@ -461,12 +461,13 @@ export function SkillDetail({ slug }: { slug: string }) {
             </div>
 
             <div className="mt-8 flex flex-wrap gap-4">
-              <Button
-                onClick={() => startLogin()}
-                className="rounded-xl bg-blue-600 px-6 font-semibold text-white shadow-md hover:bg-blue-700"
-              >
-                Join {skill.name} Circle <ArrowRight className="ml-2 size-4" />
-              </Button>
+              <Link href="/login">
+                <Button
+                  className="rounded-xl bg-blue-600 px-6 font-semibold text-white shadow-md hover:bg-blue-700"
+                >
+                  Join {skill.name} Circle <ArrowRight className="ml-2 size-4" />
+                </Button>
+              </Link>
               <Link href={`/app/assessments/${slug}`}>
                 <Button
                   variant="outline"

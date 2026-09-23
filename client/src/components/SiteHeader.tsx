@@ -165,19 +165,21 @@ export default function SiteHeader() {
             </Link>
           ) : (
             <>
-              <Button
-                onClick={() => startLogin()}
-                variant="ghost"
-                className="text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-100"
-              >
-                Sign In
-              </Button>
-              <Button
-                onClick={() => startLogin()}
-                className="rounded-lg bg-blue-600 px-4.5 py-2 text-sm font-semibold text-white shadow-sm shadow-blue-500/25 transition-all hover:bg-blue-700"
-              >
-                Get Started Free
-              </Button>
+              <Link href="/login">
+                <Button
+                  variant="ghost"
+                  className="text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-100"
+                >
+                  Sign In
+                </Button>
+              </Link>
+              <Link href="/register">
+                <Button
+                  className="rounded-lg bg-blue-600 px-4.5 py-2 text-sm font-semibold text-white shadow-sm shadow-blue-500/25 transition-all hover:bg-blue-700"
+                >
+                  Get Started Free
+                </Button>
+              </Link>
             </>
           )}
         </div>
@@ -260,19 +262,21 @@ export default function SiteHeader() {
                   </Link>
                 ) : (
                   <div className="flex flex-col gap-2">
-                    <Button
-                      onClick={() => startLogin()}
-                      variant="outline"
-                      className="w-full rounded-lg"
-                    >
-                      Sign In
-                    </Button>
-                    <Button
-                      onClick={() => startLogin()}
-                      className="w-full rounded-lg bg-blue-600 text-white font-semibold"
-                    >
-                      Get Started Free
-                    </Button>
+                    <Link href="/login">
+                      <Button
+                        variant="outline"
+                        className="w-full rounded-lg"
+                      >
+                        Sign In
+                      </Button>
+                    </Link>
+                    <Link href="/register">
+                      <Button
+                        className="w-full rounded-lg bg-blue-600 text-white font-semibold"
+                      >
+                        Get Started Free
+                      </Button>
+                    </Link>
                   </div>
                 )}
               </div>
