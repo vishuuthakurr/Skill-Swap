@@ -100,26 +100,26 @@ export function ScheduleSession() {
     <DashboardLayout>
       <div className="mb-6 flex items-center gap-2">
         <Link href="/app/sessions">
-          <Button variant="ghost" size="sm" className="rounded-full text-slate-500 hover:text-slate-800">
-            <ArrowLeft className="mr-1 size-4" /> Back to sessions
+          <Button variant="ghost" size="sm" className="rounded-xl text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+            <ArrowLeft className="mr-1.5 size-3.5" /> Back to sessions
           </Button>
         </Link>
       </div>
 
       <div className="mb-8">
-        <span className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#8f81ad]">
-          Direct Exchange Setup
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-[11px] font-semibold text-blue-700">
+          <Sparkles className="size-3" /> Direct Exchange Setup
         </span>
-        <h1 className="mt-2 font-serif text-3xl text-[#5b506e] sm:text-4xl">
+        <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
           Schedule a skill-swap session
         </h1>
-        <p className="mt-2 max-w-xl text-sm leading-6 text-slate-600">
+        <p className="mt-1.5 max-w-xl text-xs text-slate-500 leading-relaxed">
           Pick a mutually agreeable time, outline your learning agenda, and make recording consent explicit before you meet.
         </p>
       </div>
 
       <div className="grid gap-8 lg:grid-cols-[1.2fr_.8fr]">
-        <form onSubmit={handleSubmit} className="space-y-6 rounded-3xl border border-[#ebe4ef] bg-white p-7 shadow-xs">
+        <form onSubmit={handleSubmit} className="space-y-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
           <div>
             <Label className="text-xs font-semibold text-slate-700">Learning Partner</Label>
             <select
@@ -129,7 +129,7 @@ export function ScheduleSession() {
                 if (e.target.value === "member-aarav") setPartner("Aarav R. (Photography ↔ Python)");
                 else setPartner("Sana M. (French ↔ Python)");
               }}
-              className="mt-1.5 w-full rounded-xl border border-[#d8cfdf] bg-white px-3.5 py-2.5 text-xs text-slate-700 focus:ring-1 focus:ring-[#6c5d88]"
+              className="mt-1.5 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-xs text-slate-800 focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
             >
               <option value="member-aarav">Aarav R. · Matched for Photography ↔ Python</option>
               <option value="member-sana">Sana M. · Matched for French ↔ Python</option>
@@ -143,7 +143,7 @@ export function ScheduleSession() {
                 value={skill}
                 onChange={e => setSkill(e.target.value)}
                 placeholder="e.g. Python in Small Stories"
-                className="mt-1.5 rounded-xl border-[#d8cfdf] text-xs"
+                className="mt-1.5 rounded-xl border-slate-300 text-xs text-slate-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
                 required
               />
             </div>
@@ -152,7 +152,7 @@ export function ScheduleSession() {
               <select
                 value={duration}
                 onChange={e => setDuration(e.target.value)}
-                className="mt-1.5 w-full rounded-xl border border-[#d8cfdf] bg-white px-3.5 py-2.5 text-xs text-slate-700 focus:ring-1 focus:ring-[#6c5d88]"
+                className="mt-1.5 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-xs text-slate-800 focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
               >
                 <option value="30">30 minutes (Quick check-in)</option>
                 <option value="45">45 minutes (Recommended exchange)</option>
@@ -168,7 +168,7 @@ export function ScheduleSession() {
                 type="date"
                 value={date}
                 onChange={e => setDate(e.target.value)}
-                className="mt-1.5 rounded-xl border-[#d8cfdf] text-xs"
+                className="mt-1.5 rounded-xl border-slate-300 text-xs text-slate-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
                 required
               />
             </div>
@@ -178,7 +178,7 @@ export function ScheduleSession() {
                 type="time"
                 value={time}
                 onChange={e => setTime(e.target.value)}
-                className="mt-1.5 rounded-xl border-[#d8cfdf] text-xs"
+                className="mt-1.5 rounded-xl border-slate-300 text-xs text-slate-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
                 required
               />
             </div>
@@ -187,7 +187,7 @@ export function ScheduleSession() {
               <Input
                 value={timezone}
                 onChange={e => setTimezone(e.target.value)}
-                className="mt-1.5 rounded-xl border-[#d8cfdf] text-xs"
+                className="mt-1.5 rounded-xl border-slate-300 text-xs text-slate-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
                 required
               />
             </div>
@@ -200,19 +200,19 @@ export function ScheduleSession() {
               value={agenda}
               onChange={e => setAgenda(e.target.value)}
               placeholder="What will each person teach and learn during this call?"
-              className="mt-1.5 rounded-xl border-[#d8cfdf] text-xs leading-relaxed"
+              className="mt-1.5 rounded-xl border-slate-300 text-xs leading-relaxed text-slate-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
             />
           </div>
 
           {/* Recording Consent Box */}
-          <div className="rounded-2xl border border-[#cbe1d4] bg-[#f4f9f6] p-5">
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50/50 p-5">
             <div className="flex items-start justify-between gap-4">
               <div className="flex gap-3">
-                <span className="grid size-9 shrink-0 place-items-center rounded-full bg-[#e3f0e8] text-[#528066]">
+                <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-emerald-100 text-emerald-700">
                   <CircleDot className="size-4" />
                 </span>
                 <div>
-                  <h4 className="text-xs font-semibold text-[#3b634e]">Mutual Recording Consent</h4>
+                  <h4 className="text-xs font-bold text-emerald-900">Mutual Recording Consent</h4>
                   <p className="mt-1 text-xs leading-relaxed text-slate-600">
                     Sessions are recorded only when both participants explicitly consent. The recording is encrypted, stored on Cloudinary, and accessible exclusively to you two.
                   </p>
@@ -225,7 +225,7 @@ export function ScheduleSession() {
           <Button
             type="submit"
             disabled={submitting}
-            className="w-full rounded-full bg-[#6c5d88] py-6 text-sm font-medium text-white hover:bg-[#594c73]"
+            className="w-full rounded-xl bg-blue-600 py-3.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 transition"
           >
             {submitting ? "Confirming schedule..." : "Schedule Exchange & Generate Video Room"}
           </Button>
@@ -233,40 +233,40 @@ export function ScheduleSession() {
 
         {/* Informational Sidebar */}
         <div className="space-y-6">
-          <div className="rounded-3xl border border-[#ebe4ef] bg-[#faf8fb] p-6">
-            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#8f81ad]">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-6">
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-blue-700">
               <Sparkles className="size-3.5" /> How Sessions Work
             </div>
             <ul className="mt-4 space-y-4 text-xs text-slate-600">
               <li className="flex gap-2.5">
-                <Check className="mt-0.5 size-4 shrink-0 text-[#668d7b]" />
-                <span><strong>Server-Secured Room:</strong> Both members receive server-issued credentials through ZegoCloud Token04.</span>
+                <Check className="mt-0.5 size-4 shrink-0 text-emerald-600" />
+                <span><strong className="text-slate-800">Server-Secured Room:</strong> Both members receive server-issued credentials through ZegoCloud Token04.</span>
               </li>
               <li className="flex gap-2.5">
-                <Check className="mt-0.5 size-4 shrink-0 text-[#668d7b]" />
-                <span><strong>Dual Completion Confirmation:</strong> After the call, both confirm exchange completion to unlock digital certificates.</span>
+                <Check className="mt-0.5 size-4 shrink-0 text-emerald-600" />
+                <span><strong className="text-slate-800">Dual Completion Confirmation:</strong> After the call, both confirm exchange completion to unlock digital certificates.</span>
               </li>
               <li className="flex gap-2.5">
-                <Check className="mt-0.5 size-4 shrink-0 text-[#668d7b]" />
-                <span><strong>Dispute Shield:</strong> Disputed or unfulfilled exchanges are protected by administrator review.</span>
+                <Check className="mt-0.5 size-4 shrink-0 text-emerald-600" />
+                <span><strong className="text-slate-800">Dispute Shield:</strong> Disputed or unfulfilled exchanges are protected by administrator review.</span>
               </li>
             </ul>
           </div>
 
-          <div className="rounded-3xl border border-[#ebe4ef] bg-white p-6">
-            <h4 className="font-serif text-lg text-[#5b506e]">Partner Profile</h4>
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h4 className="text-sm font-bold text-slate-900">Partner Profile</h4>
             <div className="mt-4 flex items-center gap-3">
-              <div className="grid size-12 place-items-center rounded-full bg-[#e4f2eb] font-serif text-base font-semibold text-[#5c806d]">
+              <div className="grid size-11 place-items-center rounded-xl bg-blue-50 font-bold text-sm text-blue-700 border border-blue-100">
                 AR
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-800">Aarav R.</p>
+                <p className="text-sm font-semibold text-slate-800">Aarav R.</p>
                 <p className="text-xs text-slate-500">Verified Teacher in Photography</p>
               </div>
             </div>
-            <div className="mt-4 rounded-xl bg-[#f7f5f9] p-3 text-xs text-slate-600">
-              <span className="font-semibold text-slate-700">Teaches:</span> Photography (Advanced)<br />
-              <span className="font-semibold text-slate-700">Wants to learn:</span> Python (Beginner)
+            <div className="mt-4 rounded-xl border border-slate-100 bg-slate-50 p-3.5 text-xs text-slate-600 space-y-1">
+              <p><span className="font-semibold text-slate-700">Teaches:</span> Photography (Advanced)</p>
+              <p><span className="font-semibold text-slate-700">Wants to learn:</span> Python (Beginner)</p>
             </div>
           </div>
         </div>
@@ -397,17 +397,17 @@ export function LiveVideoSession({ sessionId }: { sessionId: string }) {
   };
 
   return (
-    <div className="flex h-screen flex-col bg-[#16141c] text-white">
+    <div className="flex h-screen flex-col bg-slate-950 text-white">
       {/* Top Bar */}
-      <header className="flex h-16 shrink-0 items-center justify-between border-b border-white/10 px-6">
+      <header className="flex h-16 shrink-0 items-center justify-between border-b border-slate-800 px-6">
         <div className="flex items-center gap-3">
           <Link href={`/app/sessions/${sessionId}`}>
-            <Button variant="ghost" size="icon" className="rounded-full text-slate-400 hover:text-white">
+            <Button variant="ghost" size="icon" className="rounded-xl text-slate-400 hover:text-white hover:bg-slate-800">
               <ArrowLeft className="size-5" />
             </Button>
           </Link>
           <div>
-            <h1 className="font-serif text-base text-white">Python in Small Stories ↔ Photography</h1>
+            <h1 className="font-bold text-sm sm:text-base text-white">Python in Small Stories ↔ Photography</h1>
             <p className="text-[11px] text-slate-400">Exchange Room · ID: {sessionId}</p>
           </div>
         </div>
@@ -451,19 +451,19 @@ export function LiveVideoSession({ sessionId }: { sessionId: string }) {
       <main className="relative flex-1 overflow-hidden p-4 sm:p-6" ref={videoContainerRef}>
         <div className="grid h-full grid-cols-1 gap-4 lg:grid-cols-2">
           {/* Remote Participant Video Window */}
-          <div className="relative flex flex-col items-center justify-center overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-[#241f30] to-[#1c1825]">
+          <div className="relative flex flex-col items-center justify-center overflow-hidden rounded-2xl border border-slate-800 bg-slate-900">
             <div className="text-center">
-              <div className="mx-auto grid size-28 place-items-center rounded-full bg-[#8f81ad]/20 font-serif text-3xl font-medium text-[#cbbfe4] shadow-inner">
+              <div className="mx-auto grid size-24 place-items-center rounded-2xl bg-blue-950/80 border border-blue-800/40 text-3xl font-bold text-blue-300 shadow-inner">
                 AR
               </div>
-              <p className="mt-4 font-serif text-xl text-white">Aarav R.</p>
+              <p className="mt-4 text-lg font-bold text-white">Aarav R.</p>
               <p className="mt-1 text-xs text-slate-400">Teaching Photography · Learning Python</p>
-              <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-[11px] text-emerald-300">
+              <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-[11px] text-emerald-300 border border-emerald-500/20">
                 <Volume2 className="size-3.5" /> Audio Connected
               </div>
             </div>
 
-            <div className="absolute bottom-4 left-4 rounded-full bg-black/60 px-3 py-1 text-xs backdrop-blur-md">
+            <div className="absolute bottom-4 left-4 rounded-xl bg-black/60 px-3 py-1 text-xs backdrop-blur-md text-white font-medium">
               Aarav R. (Remote)
             </div>
             <div className="absolute top-4 right-4 flex items-center gap-1 rounded-full bg-black/60 px-2.5 py-1 text-[10px] text-emerald-300 backdrop-blur-md">
@@ -472,7 +472,7 @@ export function LiveVideoSession({ sessionId }: { sessionId: string }) {
           </div>
 
           {/* Local Participant Video Window (Webcam) */}
-          <div className="relative flex flex-col items-center justify-center overflow-hidden rounded-3xl border border-white/10 bg-[#1e1b26]">
+          <div className="relative flex flex-col items-center justify-center overflow-hidden rounded-2xl border border-slate-800 bg-slate-900">
             {cameraActive ? (
               <video
                 ref={localVideoRef}
@@ -483,14 +483,14 @@ export function LiveVideoSession({ sessionId }: { sessionId: string }) {
               />
             ) : (
               <div className="text-center">
-                <div className="mx-auto grid size-24 place-items-center rounded-full bg-white/5 text-slate-400">
-                  <VideoOff className="size-8" />
+                <div className="mx-auto grid size-20 place-items-center rounded-2xl bg-slate-800 text-slate-400">
+                  <VideoOff className="size-7" />
                 </div>
-                <p className="mt-3 text-sm text-slate-400">Camera is turned off</p>
+                <p className="mt-3 text-xs text-slate-400">Camera is turned off</p>
               </div>
             )}
 
-            <div className="absolute bottom-4 left-4 flex items-center gap-2 rounded-full bg-black/60 px-3 py-1 text-xs backdrop-blur-md">
+            <div className="absolute bottom-4 left-4 flex items-center gap-2 rounded-xl bg-black/60 px-3 py-1 text-xs backdrop-blur-md text-white font-medium">
               <span>You (Local)</span>
               {!micActive && <MicOff className="size-3 text-rose-400" />}
             </div>
@@ -499,14 +499,14 @@ export function LiveVideoSession({ sessionId }: { sessionId: string }) {
       </main>
 
       {/* Bottom Floating Controls Bar */}
-      <footer className="flex h-20 shrink-0 items-center justify-center border-t border-white/10 bg-[#121017] px-6">
+      <footer className="flex h-20 shrink-0 items-center justify-center border-t border-slate-800 bg-slate-950 px-6">
         <div className="flex items-center gap-3">
           <Button
             onClick={toggleMic}
             variant={micActive ? "outline" : "destructive"}
             size="icon"
-            className={`size-12 rounded-full border-white/10 ${
-              micActive ? "bg-white/10 text-white hover:bg-white/20" : "bg-rose-600 text-white"
+            className={`size-11 rounded-xl border-slate-700 ${
+              micActive ? "bg-slate-800 text-white hover:bg-slate-700" : "bg-rose-600 text-white hover:bg-rose-700"
             }`}
           >
             {micActive ? <Mic className="size-5" /> : <MicOff className="size-5" />}
@@ -516,8 +516,8 @@ export function LiveVideoSession({ sessionId }: { sessionId: string }) {
             onClick={toggleCamera}
             variant={cameraActive ? "outline" : "destructive"}
             size="icon"
-            className={`size-12 rounded-full border-white/10 ${
-              cameraActive ? "bg-white/10 text-white hover:bg-white/20" : "bg-rose-600 text-white"
+            className={`size-11 rounded-xl border-slate-700 ${
+              cameraActive ? "bg-slate-800 text-white hover:bg-slate-700" : "bg-rose-600 text-white hover:bg-rose-700"
             }`}
           >
             {cameraActive ? <Video className="size-5" /> : <VideoOff className="size-5" />}
@@ -527,32 +527,32 @@ export function LiveVideoSession({ sessionId }: { sessionId: string }) {
             onClick={toggleScreenShare}
             variant="outline"
             size="icon"
-            className={`size-12 rounded-full border-white/10 ${
-              screenShareActive ? "bg-indigo-600 text-white" : "bg-white/10 text-white hover:bg-white/20"
+            className={`size-11 rounded-xl border-slate-700 ${
+              screenShareActive ? "bg-blue-600 text-white" : "bg-slate-800 text-white hover:bg-slate-700"
             }`}
           >
             <Monitor className="size-5" />
           </Button>
 
-          <div className="mx-2 h-6 w-px bg-white/10" />
+          <div className="mx-2 h-6 w-px bg-slate-800" />
 
           <Button
             onClick={() => setEndCallModalOpen(true)}
-            className="rounded-full bg-rose-600 px-6 py-6 font-medium text-white shadow-lg hover:bg-rose-700"
+            className="rounded-xl bg-rose-600 px-5 py-2.5 font-semibold text-white shadow-sm hover:bg-rose-700 transition text-xs"
           >
-            <PhoneOff className="mr-2 size-4" /> End Call
+            <PhoneOff className="mr-1.5 size-4" /> End Call
           </Button>
         </div>
       </footer>
 
       {/* End Call & Confirmation Dialog */}
       <Dialog open={endCallModalOpen} onOpenChange={setEndCallModalOpen}>
-        <DialogContent className="max-w-md bg-[#faf8fb] text-slate-800 sm:rounded-2xl">
+        <DialogContent className="max-w-md bg-white text-slate-800 sm:rounded-2xl border border-slate-200">
           <DialogHeader>
-            <DialogTitle className="font-serif text-2xl text-[#5b506e]">
+            <DialogTitle className="text-xl font-bold tracking-tight text-slate-900">
               {sessionCompleted ? "Session Completed!" : "Complete Learning Exchange?"}
             </DialogTitle>
-            <DialogDescription className="text-xs text-slate-500">
+            <DialogDescription className="text-xs text-slate-500 leading-relaxed">
               {sessionCompleted
                 ? "Both participants have verified completion. Your digital certificate of exchange has been auto-generated."
                 : "Did you and Aarav successfully conduct your skill exchange? Confirming completion awards you both your digital certificates."}
@@ -560,15 +560,15 @@ export function LiveVideoSession({ sessionId }: { sessionId: string }) {
           </DialogHeader>
 
           {sessionCompleted ? (
-            <div className="rounded-2xl border border-[#cbe1d4] bg-[#f4f9f6] p-5 text-center">
-              <CheckCircle2 className="mx-auto size-10 text-[#528066]" />
-              <h3 className="mt-3 font-serif text-lg text-[#3b634e]">Certificate Unlocked</h3>
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-5 text-center">
+              <CheckCircle2 className="mx-auto size-10 text-emerald-600" />
+              <h3 className="mt-3 text-base font-bold text-emerald-900">Certificate Unlocked</h3>
               <p className="mt-1 text-xs text-slate-600">
                 You can now download your certificate or verify it anytime through your certificates dashboard.
               </p>
               <div className="mt-4 flex justify-center gap-3">
                 <Link href="/app/certificates">
-                  <Button className="rounded-full bg-[#528066] text-white hover:bg-[#436b54] text-xs">
+                  <Button className="rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 text-xs font-semibold shadow-sm">
                     View Certificate <ExternalLink className="ml-1.5 size-3.5" />
                   </Button>
                 </Link>
@@ -576,10 +576,10 @@ export function LiveVideoSession({ sessionId }: { sessionId: string }) {
             </div>
           ) : (
             <div className="space-y-4 py-2">
-              <div className="rounded-xl border border-[#ebe4ef] bg-white p-4">
-                <p className="text-xs font-semibold text-[#6c5d88]">Session Summary</p>
-                <p className="mt-1 text-sm font-serif text-slate-800">Python in Small Stories ↔ Photography</p>
-                <p className="text-xs text-slate-500">Duration: {formatTime(callDuration)}</p>
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <p className="text-xs font-bold text-blue-700">Session Summary</p>
+                <p className="mt-1 text-sm font-semibold text-slate-900">Python in Small Stories ↔ Photography</p>
+                <p className="mt-0.5 text-xs text-slate-500">Duration: {formatTime(callDuration)}</p>
               </div>
             </div>
           )}
@@ -593,14 +593,14 @@ export function LiveVideoSession({ sessionId }: { sessionId: string }) {
                     setEndCallModalOpen(false);
                     setLocation("/app/sessions");
                   }}
-                  className="rounded-full text-xs text-slate-500"
+                  className="rounded-xl text-xs text-slate-500 hover:bg-slate-100"
                 >
                   Leave without confirming
                 </Button>
                 <Button
                   onClick={handleConfirmCompletion}
                   disabled={completing}
-                  className="rounded-full bg-[#6c5d88] text-white hover:bg-[#5b4e74] text-xs"
+                  className="rounded-xl bg-blue-600 text-white hover:bg-blue-700 text-xs font-semibold shadow-sm"
                 >
                   {completing ? "Confirming..." : "Confirm & Award Certificate"}
                 </Button>
@@ -608,7 +608,7 @@ export function LiveVideoSession({ sessionId }: { sessionId: string }) {
             ) : (
               <Button
                 onClick={() => setLocation("/app/sessions")}
-                className="w-full rounded-full bg-[#6c5d88] text-white text-xs"
+                className="w-full rounded-xl bg-blue-600 text-white text-xs font-semibold shadow-sm hover:bg-blue-700"
               >
                 Back to Sessions Dashboard
               </Button>
@@ -619,9 +619,9 @@ export function LiveVideoSession({ sessionId }: { sessionId: string }) {
 
       {/* Dispute Modal */}
       <Dialog open={disputeModalOpen} onOpenChange={setDisputeModalOpen}>
-        <DialogContent className="max-w-md bg-[#faf8fb] text-slate-800 sm:rounded-2xl">
+        <DialogContent className="max-w-md bg-white text-slate-800 sm:rounded-2xl border border-slate-200">
           <DialogHeader>
-            <DialogTitle className="font-serif text-2xl text-amber-700">Report / Dispute Session</DialogTitle>
+            <DialogTitle className="text-xl font-bold text-amber-700">Report / Dispute Session</DialogTitle>
             <DialogDescription className="text-xs text-slate-500">
               If the partner was absent, inappropriate, or failed to exchange skills, file a dispute for administrator review.
             </DialogDescription>
@@ -634,18 +634,18 @@ export function LiveVideoSession({ sessionId }: { sessionId: string }) {
               placeholder="e.g. Partner disconnected after 5 minutes and did not return..."
               value={disputeReason}
               onChange={e => setDisputeReason(e.target.value)}
-              className="rounded-xl border-[#d8cfdf] bg-white text-xs leading-relaxed"
+              className="rounded-xl border-slate-300 bg-white text-xs leading-relaxed text-slate-900 focus:border-amber-600 focus:ring-amber-100"
             />
           </div>
 
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setDisputeModalOpen(false)} className="rounded-full text-xs">
+            <Button variant="ghost" onClick={() => setDisputeModalOpen(false)} className="rounded-xl text-xs text-slate-600 hover:bg-slate-100">
               Cancel
             </Button>
             <Button
               onClick={handleDispute}
               disabled={disputeReason.trim().length < 8}
-              className="rounded-full bg-amber-600 text-white hover:bg-amber-700 text-xs"
+              className="rounded-xl bg-amber-600 text-white hover:bg-amber-700 text-xs font-semibold shadow-sm"
             >
               Submit Dispute
             </Button>
@@ -694,8 +694,8 @@ export function SessionDetail({ sessionId }: { sessionId: string }) {
     <DashboardLayout>
       <div className="mb-6 flex items-center gap-2">
         <Link href="/app/sessions">
-          <Button variant="ghost" size="sm" className="rounded-full text-slate-500 hover:text-slate-800">
-            <ArrowLeft className="mr-1 size-4" /> All Sessions
+          <Button variant="ghost" size="sm" className="rounded-xl text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+            <ArrowLeft className="mr-1.5 size-3.5" /> All Sessions
           </Button>
         </Link>
       </div>
@@ -703,27 +703,27 @@ export function SessionDetail({ sessionId }: { sessionId: string }) {
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <div className="flex items-center gap-2">
-            <span className="font-mono text-xs text-slate-400">ID: {sessionId}</span>
+            <span className="font-mono text-xs font-semibold text-slate-500">ID: {sessionId}</span>
             <Badge
-              className={`rounded-full text-[10px] uppercase tracking-wider ${
+              className={`rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${
                 session.status === "completed"
-                  ? "bg-[#e7f1ea] text-[#5d806d]"
+                  ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                   : session.status === "live"
                   ? "bg-rose-500 text-white animate-pulse"
-                  : "bg-[#eee6f7] text-[#6c5d88]"
+                  : "bg-blue-50 text-blue-700 border border-blue-200"
               }`}
             >
               {session.status}
             </Badge>
           </div>
-          <h1 className="mt-2 font-serif text-3xl text-[#5b506e]">{session.skill}</h1>
+          <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">{session.skill}</h1>
         </div>
 
         <div className="flex gap-2">
           {session.status !== "completed" && (
             <Link href={`/app/sessions/${sessionId}/live`}>
-              <Button className="rounded-full bg-[#6c5d88] text-white hover:bg-[#594c73]">
-                <Video className="mr-2 size-4" /> Enter Video Room
+              <Button className="rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-blue-700 transition">
+                <Video className="mr-1.5 size-4" /> Enter Video Room
               </Button>
             </Link>
           )}
@@ -732,44 +732,44 @@ export function SessionDetail({ sessionId }: { sessionId: string }) {
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[1.2fr_.8fr]">
         <div className="space-y-6">
-          <div className="rounded-3xl border border-[#ebe4ef] bg-white p-7">
-            <h3 className="font-serif text-xl text-[#5b506e]">Session Agenda</h3>
-            <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-slate-600">
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-7 shadow-sm">
+            <h3 className="text-lg font-bold text-slate-900">Session Agenda</h3>
+            <p className="mt-3 whitespace-pre-line text-xs sm:text-sm leading-relaxed text-slate-600">
               {session.agenda}
             </p>
 
-            <div className="mt-6 border-t border-[#f0ebf3] pt-6">
-              <h4 className="text-xs font-semibold text-slate-700">Exchange Schedule</h4>
+            <div className="mt-6 border-t border-slate-100 pt-6">
+              <h4 className="text-xs font-bold text-slate-700">Exchange Schedule</h4>
               <div className="mt-3 grid gap-3 sm:grid-cols-2 text-xs text-slate-600">
-                <div>
+                <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
                   <span className="text-slate-400">Date & Time:</span><br />
-                  <strong className="text-slate-800">{session.start_at}</strong>
+                  <strong className="text-slate-900 font-semibold">{session.start_at}</strong>
                 </div>
-                <div>
+                <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
                   <span className="text-slate-400">Duration:</span><br />
-                  <strong className="text-slate-800">{session.duration}</strong>
+                  <strong className="text-slate-900 font-semibold">{session.duration}</strong>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="rounded-3xl border border-[#ebe4ef] bg-white p-7">
-            <h3 className="font-serif text-xl text-[#5b506e]">Exchange Completion</h3>
-            <p className="mt-2 text-xs leading-relaxed text-slate-600">
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-7 shadow-sm">
+            <h3 className="text-lg font-bold text-slate-900">Exchange Completion</h3>
+            <p className="mt-1.5 text-xs leading-relaxed text-slate-600">
               When both you and your partner confirm that the session has concluded, a tamper-proof digital certificate is issued to both participants.
             </p>
 
-            <div className="mt-5 flex items-center justify-between rounded-2xl bg-[#faf8fb] p-4">
+            <div className="mt-5 flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-4">
               <div className="flex items-center gap-2 text-xs">
                 <CheckCircle2 className={`size-4 ${session.status === "completed" ? "text-emerald-600" : "text-slate-400"}`} />
-                <span>Completion Status: <strong>{session.status === "completed" ? "Verified & Completed" : "Awaiting confirmation"}</strong></span>
+                <span className="text-slate-700">Status: <strong className="text-slate-900">{session.status === "completed" ? "Verified & Completed" : "Awaiting confirmation"}</strong></span>
               </div>
               {session.status !== "completed" && (
                 <Button
                   onClick={handleConfirm}
                   disabled={confirming}
                   size="sm"
-                  className="rounded-full bg-[#6c5d88] text-white text-xs"
+                  className="rounded-xl bg-blue-600 px-3.5 py-1.5 text-white hover:bg-blue-700 text-xs font-semibold shadow-sm"
                 >
                   {confirming ? "Confirming..." : "Confirm Completed"}
                 </Button>
@@ -780,21 +780,21 @@ export function SessionDetail({ sessionId }: { sessionId: string }) {
 
         {/* Sidebar */}
         <div className="space-y-6">
-          <div className="rounded-3xl border border-[#ebe4ef] bg-white p-6">
-            <h4 className="font-serif text-lg text-[#5b506e]">Learning Partner</h4>
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h4 className="text-sm font-bold text-slate-900">Learning Partner</h4>
             <div className="mt-4 flex items-center gap-3">
-              <div className="grid size-12 place-items-center rounded-full bg-[#e4f2eb] font-serif text-base font-semibold text-[#5c806d]">
+              <div className="grid size-11 place-items-center rounded-xl bg-blue-50 font-bold text-sm text-blue-700 border border-blue-100">
                 {session.partner_initials}
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-800">{session.partner_name}</p>
+                <p className="text-sm font-semibold text-slate-800">{session.partner_name}</p>
                 <p className="text-xs text-slate-500">Verified Skill-Swap Member</p>
               </div>
             </div>
           </div>
 
-          <div className="rounded-3xl border border-[#cbe1d4] bg-[#f4f9f6] p-6">
-            <div className="flex items-center gap-2 text-xs font-semibold text-[#3b634e]">
+          <div className="rounded-2xl border border-emerald-200 bg-emerald-50/50 p-6">
+            <div className="flex items-center gap-2 text-xs font-bold text-emerald-800">
               <ShieldCheck className="size-4" /> Recording & Privacy Safe
             </div>
             <p className="mt-2 text-xs leading-relaxed text-slate-600">
