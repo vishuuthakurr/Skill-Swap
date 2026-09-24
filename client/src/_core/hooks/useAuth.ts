@@ -1,98 +1,114 @@
-import { startLogin } from "@/const";
-import { trpc } from "@/lib/trpc";
-import { TRPCClientError } from "@trpc/client";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { apiRequest } from "@/lib/api";
+
+export type AuthUser = {
+  id: string;
+  name?: string;
+  email?: string;
+  role?: string;
+  [key: string]: any;
+};
 
 type UseAuthOptions = {
   redirectOnUnauthenticated?: boolean;
   redirectPath?: string;
 };
 
+const DEFAULT_DEMO_USER: AuthUser = {
+  id: "demo-user-01",
+  name: "Vaibhav Singh",
+  email: "vaibhav@skillswap.local",
+  role: "user",
+};
+
 export function useAuth(options?: UseAuthOptions) {
-  // Login is started via startLogin() in the effect below, only when we actually
-  // navigate — never during render. startLogin() mints a one-time nonce + writes
-  // the state cookie, so calling it per render would overwrite the cookie and
-  // desync it from an in-flight login's `state`.
-  const { redirectOnUnauthenticated = false, redirectPath } = options ?? {};
-  const utils = trpc.useUtils();
+  const { redirectOnUnauthenticated = false, redirectPath = "/login" } =
+    options ?? {};
 
-  const meQuery = trpc.auth.me.useQuery(undefined, {
-    retry: false,
-    refetchOnWindowFocus: false,
-  });
-
-  const logoutMutation = trpc.auth.logout.useMutation({
-    onSuccess: () => {
-      utils.auth.me.setData(undefined, null);
-    },
-  });
-
-  const logout = useCallback(async () => {
+  const [user, setUser] = useState<AuthUser | null>(() => {
+    if (typeof window === "undefined") return null;
     try {
-      await logoutMutation.mutateAsync();
-    } catch (error: unknown) {
-      if (
-        error instanceof TRPCClientError &&
-        error.data?.code === "UNAUTHORIZED"
-      ) {
-        return;
-      }
-      throw error;
-    } finally {
-      // Clear the Preview auto-login token mirrored into sessionStorage, so
-      // header-based sessions (Safari ITP / WebView) are logged out too. The
-      // backend cookie is cleared by the logout mutation.
-      try {
-        sessionStorage.removeItem("manus-cookie");
-      } catch {}
-      utils.auth.me.setData(undefined, null);
-      await utils.auth.me.invalidate();
-    }
-  }, [logoutMutation, utils]);
+      const stored = window.sessionStorage.getItem("skill_swap_user");
+      if (stored) return JSON.parse(stored);
+      // Auto-fallback to demo session if token is set
+      const token = window.sessionStorage.getItem("skill_swap_access_token");
+      if (token) return DEFAULT_DEMO_USER;
+    } catch {}
+    return null;
+  });
 
-  const state = useMemo(() => {
-    localStorage.setItem(
-      "manus-runtime-user-info",
-      JSON.stringify(meQuery.data)
-    );
-    return {
-      user: meQuery.data ?? null,
-      loading: meQuery.isLoading || logoutMutation.isPending,
-      error: meQuery.error ?? logoutMutation.error ?? null,
-      isAuthenticated: Boolean(meQuery.data),
-    };
-  }, [
-    meQuery.data,
-    meQuery.error,
-    meQuery.isLoading,
-    logoutMutation.error,
-    logoutMutation.isPending,
-  ]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const fetchCurrentUser = useCallback(async () => {
+    if (typeof window === "undefined") return;
+    const token = window.sessionStorage.getItem("skill_swap_access_token");
+    if (!token) return;
+
+    try {
+      setLoading(true);
+      const data = await apiRequest<AuthUser>("/auth/me");
+      if (data && data.id) {
+        setUser(data);
+        window.sessionStorage.setItem("skill_swap_user", JSON.stringify(data));
+      }
+    } catch (err: any) {
+      setError(err instanceof Error ? err : new Error(String(err)));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCurrentUser();
+  }, [fetchCurrentUser]);
 
   useEffect(() => {
     if (!redirectOnUnauthenticated) return;
-    if (meQuery.isLoading || logoutMutation.isPending) return;
-    if (state.user) return;
+    if (loading) return;
+    if (user) return;
     if (typeof window === "undefined") return;
-    if (redirectPath && window.location.pathname === redirectPath) return;
+    if (window.location.pathname === redirectPath) return;
 
-    // Navigate at this moment only. startLogin() mints the nonce + cookie itself.
-    if (redirectPath) {
-      window.location.href = redirectPath;
-    } else {
-      startLogin();
+    window.location.href = redirectPath;
+  }, [redirectOnUnauthenticated, redirectPath, loading, user]);
+
+  const logout = useCallback(async () => {
+    try {
+      await apiRequest("/auth/logout", { method: "POST" }).catch(() => {});
+    } catch {}
+    if (typeof window !== "undefined") {
+      window.sessionStorage.removeItem("skill_swap_access_token");
+      window.sessionStorage.removeItem("skill_swap_user");
+      window.sessionStorage.removeItem("manus-cookie");
     }
-  }, [
-    redirectOnUnauthenticated,
-    redirectPath,
-    logoutMutation.isPending,
-    meQuery.isLoading,
-    state.user,
-  ]);
+    setUser(null);
+    if (typeof window !== "undefined") {
+      window.location.href = "/login";
+    }
+  }, []);
+
+  const loginAsDemo = useCallback((role: "user" | "admin" = "user") => {
+    const demo: AuthUser = {
+      ...DEFAULT_DEMO_USER,
+      role,
+      name: role === "admin" ? "Admin Moderator" : "Vaibhav Singh",
+      email: role === "admin" ? "admin@skillswap.local" : "vaibhav@skillswap.local",
+    };
+    if (typeof window !== "undefined") {
+      window.sessionStorage.setItem("skill_swap_access_token", "demo-token-" + Date.now());
+      window.sessionStorage.setItem("skill_swap_user", JSON.stringify(demo));
+    }
+    setUser(demo);
+  }, []);
 
   return {
-    ...state,
-    refresh: () => meQuery.refetch(),
+    user,
+    loading,
+    error,
+    isAuthenticated: Boolean(user),
+    refresh: fetchCurrentUser,
     logout,
+    loginAsDemo,
   };
 }

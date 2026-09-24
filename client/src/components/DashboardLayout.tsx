@@ -100,7 +100,7 @@ export default function DashboardLayout({
   variant?: DashboardVariant;
 }) {
   const [sidebarWidth, setSidebarWidth] = useState(260);
-  const { loading, user } = useAuth();
+  const { loading, user, loginAsDemo } = useAuth();
   useEffect(() => {
     const saved = window.localStorage.getItem(`skill-swap-${variant}-sidebar`);
     if (saved) setSidebarWidth(Number(saved));
@@ -125,13 +125,22 @@ export default function DashboardLayout({
           <p className="mt-2 text-sm text-slate-500">
             Access your courses, swaps, assessments, and verified credentials.
           </p>
-          <Link href="/login">
+          <div className="mt-6 flex flex-col gap-2.5">
+            <Link href="/login">
+              <Button
+                className="w-full rounded-xl bg-blue-600 py-2.5 font-semibold text-white shadow-sm hover:bg-blue-700"
+              >
+                Sign In to Account
+              </Button>
+            </Link>
             <Button
-              className="mt-6 w-full rounded-lg bg-blue-600 py-2.5 font-semibold text-white shadow-sm hover:bg-blue-700"
+              variant="outline"
+              onClick={() => loginAsDemo("user")}
+              className="w-full rounded-xl border-slate-300 py-2.5 font-medium text-slate-700 hover:bg-slate-50 cursor-pointer"
             >
-              Sign In
+              Explore as Demo Member
             </Button>
-          </Link>
+          </div>
         </div>
       </div>
     );

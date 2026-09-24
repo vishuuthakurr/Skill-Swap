@@ -58,8 +58,10 @@ class LoginView(APIView):
         email = str(request.data.get("email", "")).strip().lower()
         password = str(request.data.get("password", ""))
         user = mongo_db().users.find_one({"email": email})
-        if not user or not user.get("email_verified") or not check_password(password, user.get("password_hash", "")):
+        if not user or not check_password(password, user.get("password_hash", "")):
             return Response({"detail": "Email or password is incorrect."}, status=401)
+        if not user.get("email_verified"):
+            return Response({"detail": "Please verify your email address before signing in.", "unverified": True, "email": email}, status=403)
         if user.get("status") != "active":
             return Response({"detail": "Account is not active."}, status=403)
         return Response({"access_token": create_access_token(user), "user": {"id": str(user["id"]), "name": user.get("name"), "email": user.get("email"), "role": user.get("role", "user")}})
@@ -69,7 +71,7 @@ class MeView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        user = mongo_db().users.find_one({"id": str(request.user["id"])}, {"password_hash": 0})
+        user = mongo_db().users.find_one({"id": str(request.user["id"])}, {"password_hash": 0, "_id": 0})
         return Response(user or {"detail": "User not found."}, status=200 if user else 404)
 
 
