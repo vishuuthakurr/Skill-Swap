@@ -225,6 +225,36 @@ export function Login() {
             {loading ? "Signing in..." : "Sign in to Account"}{" "}
             <ArrowUpRight className="ml-1.5 size-4" />
           </Button>
+
+          <div className="relative my-3 flex items-center justify-center">
+            <span className="w-full border-t border-slate-200" />
+            <span className="bg-white px-2 text-[10px] font-semibold text-slate-400 uppercase">Or preview</span>
+            <span className="w-full border-t border-slate-200" />
+          </div>
+
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              window.sessionStorage.setItem(
+                "skill_swap_user",
+                JSON.stringify({
+                  id: "demo-user-01",
+                  name: "Vaibhav Singh",
+                  email: "vaibhav@skillswap.local",
+                  role: "user",
+                })
+              );
+              window.sessionStorage.setItem(
+                "skill_swap_access_token",
+                "demo-token-" + Date.now()
+              );
+              window.location.assign("/app/dashboard");
+            }}
+            className="h-10 w-full rounded-xl border-slate-300 text-xs font-medium text-slate-700 hover:bg-slate-50 transition"
+          >
+            Explore as Demo Member (Vaibhav Singh)
+          </Button>
         </form>
 
         <p className="mt-6 text-center text-xs text-slate-500">
