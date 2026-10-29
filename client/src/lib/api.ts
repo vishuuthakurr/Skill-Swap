@@ -157,7 +157,34 @@ function handleOfflineFallback<T>(path: string, init: RequestInit): T {
     return { message: "Logged out" } as T;
   }
 
-  // 6. Generic Fallbacks for dashboard queries
+  // 6. Generic Fallbacks for dashboard and auth queries
+  if (path === "/auth/resend-otp") {
+    return { message: "Security code resent.", dev_otp: "123456" } as T;
+  }
+  if (path === "/auth/forgot-password") {
+    return { message: "Password reset instructions sent." } as T;
+  }
+  if (path.startsWith("/auth/reset-password")) {
+    return { message: "Password successfully updated." } as T;
+  }
+  if (path === "/profile/me") {
+    if (typeof window !== "undefined") {
+      const stored = window.sessionStorage.getItem("skill_swap_user");
+      if (stored) {
+        const u = JSON.parse(stored);
+        if (method === "PUT" || method === "PATCH" || method === "POST") {
+          const updated = { ...u, ...body };
+          window.sessionStorage.setItem("skill_swap_user", JSON.stringify(updated));
+          return updated as T;
+        }
+        return u as T;
+      }
+    }
+    return { name: "Member", role: "user" } as T;
+  }
+  if (path === "/profile/avatar") {
+    return { message: "Avatar updated." } as T;
+  }
   if (path === "/my-skills") {
     return [] as T;
   }
@@ -169,6 +196,9 @@ function handleOfflineFallback<T>(path: string, init: RequestInit): T {
   }
   if (path === "/notifications") {
     return [] as T;
+  }
+  if (path.startsWith("/admin/")) {
+    return { items: [], total: 0 } as T;
   }
 
   return {} as T;
@@ -216,19 +246,44 @@ export async function apiRequest<T>(
     }
   }
 
-  if (!response || !response.ok) {
-    // If backend 404/502 on Vercel deployment, fallback to client-side session
-    if (!response || response.status === 404 || response.status >= 500) {
-      try {
-        return handleOfflineFallback<T>(path, init);
-      } catch {}
+  const contentType = response?.headers?.get("content-type") || "";
+  const isHtml = contentType.includes("text/html");
+
+  // If deployed statically on Vercel without a cloud backend:
+  // - POST/PUT/DELETE return 405 Method Not Allowed
+  // - GET returns 200 text/html (SPA fallback rewrite to index.html)
+  // - Missing routes return 404
+  // - Down server returns 502/503/504
+  if (
+    !response ||
+    isHtml ||
+    response.status === 405 ||
+    response.status === 404 ||
+    response.status >= 500
+  ) {
+    try {
+      return handleOfflineFallback<T>(path, init);
+    } catch (fallbackError) {
+      if (fallbackError instanceof Error) {
+        throw fallbackError;
+      }
+      throw new Error("The request could not be completed.");
     }
-    const payload = (await response?.json().catch(() => ({}))) as T & ApiError;
-    throw new Error(
-      payload.error?.detail ||
-        payload.detail ||
-        "The request could not be completed."
-    );
+  }
+
+  if (!response.ok) {
+    const payload = (await response.json().catch(() => ({}))) as T & ApiError;
+    if (payload && (payload.error?.detail || payload.detail)) {
+      throw new Error(payload.error?.detail || payload.detail);
+    }
+    try {
+      return handleOfflineFallback<T>(path, init);
+    } catch (fallbackError) {
+      if (fallbackError instanceof Error) {
+        throw fallbackError;
+      }
+      throw new Error("The request could not be completed.");
+    }
   }
 
   const payload = (await response.json().catch(() => ({}))) as T;

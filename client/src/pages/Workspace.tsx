@@ -33,6 +33,7 @@ import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import DashboardLayout from "@/components/DashboardLayout";
 import { apiRequest } from "@/lib/api";
+import { useAuth } from "@/_core/hooks/useAuth";
 
 const activity = [
   {
@@ -144,11 +145,14 @@ function AvatarBubble({
 }
 
 export function MemberDashboard() {
+  const { user } = useAuth();
+  const displayName = user?.name ? user.name.split(" ")[0] : "Member";
+
   return (
     <DashboardLayout>
       <WorkspaceHeader
         eyebrow="Learner & Mentor Workspace"
-        title="Welcome back, Vaibhav"
+        title={`Welcome back, ${displayName}`}
         copy="Manage your reciprocal skill exchanges, schedule live video rooms, and verify teaching credentials."
         action={
           <Link href="/skills">
@@ -525,6 +529,9 @@ export function DiscoverMatches() {
 }
 
 export function Messages() {
+  const { user } = useAuth();
+  const firstName = user?.name ? user.name.split(" ")[0] : "there";
+
   return (
     <DashboardLayout>
       <WorkspaceHeader
@@ -577,8 +584,7 @@ export function Messages() {
 
           <div className="flex flex-1 flex-col justify-end gap-3 py-6">
             <div className="max-w-[80%] self-start rounded-2xl rounded-bl-sm bg-slate-100 px-4 py-3 text-xs leading-relaxed text-slate-700">
-              Hi Vaibhav! I saw you are exploring photography. I could share a
-              few practical ways to get started with lighting and composition.
+              {`Hi ${firstName}! I saw you are exploring photography. I could share a few practical ways to get started with lighting and composition.`}
             </div>
             <div className="max-w-[80%] self-end rounded-2xl rounded-br-sm bg-blue-600 px-4 py-3 text-xs leading-relaxed text-white">
               That sounds great. I can demonstrate how I use Python and FastAPI
@@ -1111,6 +1117,10 @@ export function Recordings() {
 }
 
 export function Profile() {
+  const { user } = useAuth();
+  const userName = user?.name || "Member";
+  const userEmail = user?.email || "member@skillswap.local";
+  const userInitials = userName.slice(0, 2).toUpperCase() || "SS";
   const [avatarUrl, setAvatarUrl] = useState("");
   const [uploadState, setUploadState] = useState("");
   const uploadAvatar = async (file: File) => {
@@ -1153,7 +1163,7 @@ export function Profile() {
                 className="size-full object-cover"
               />
             ) : (
-              <span className="grid size-full place-items-center">VS</span>
+              <span className="grid size-full place-items-center">{userInitials}</span>
             )}
             <input
               type="file"
@@ -1169,10 +1179,10 @@ export function Profile() {
             <p className="mt-2 text-xs font-semibold text-emerald-600">{uploadState}</p>
           )}
           <h3 className="mt-4 text-xl font-bold text-slate-900">
-            Vaibhav Singh
+            {userName}
           </h3>
           <p className="mt-0.5 text-xs text-slate-500">
-            Kanpur, India · Verified Teacher
+            {userEmail} · Verified Member
           </p>
           <div className="mt-5 flex flex-wrap justify-center gap-2">
             <span className="rounded-md bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700">
@@ -1189,7 +1199,8 @@ export function Profile() {
             <label className="text-xs font-semibold text-slate-700">
               Display Name
               <Input
-                defaultValue="Vaibhav Singh"
+                defaultValue={userName}
+                key={userName}
                 className="mt-1.5 h-10 rounded-xl border-slate-200 text-xs"
               />
             </label>
