@@ -30,7 +30,10 @@ class RegisterView(APIView):
             return Response({"detail": "If this email can be used, a verification message will be sent."}, status=202)
         user = {"id": secrets.token_urlsafe(16), "email": email, "name": name, "password_hash": hash_password(password), "role": "user", "status": "pending_email", "email_verified": False, "created_at": datetime.now(timezone.utc)}
         db.users.insert_one(user)
-        otp = issue_otp(email)
+        try:
+            otp = issue_otp(email)
+        except RuntimeError as exc:
+            return Response({"detail": f"Verification email could not be sent. {exc}"}, status=503)
         res_data = {"message": "Verification code sent.", "email": email}
         if settings.DEBUG:
             res_data["dev_otp"] = otp
@@ -661,7 +664,10 @@ class ResendOtpView(APIView):
         if not allow_rate_limited_action(f"otp-resend:{email}", limit=3, window_seconds=600):
             return Response({"detail": "Too many code requests. Try again later."}, status=429)
         if email:
-            issue_otp(email)
+            try:
+                issue_otp(email)
+            except RuntimeError as exc:
+                return Response({"detail": f"Verification email could not be sent. {exc}"}, status=503)
         return Response({"message": "If the account can be verified, a new code has been sent."})
 
 

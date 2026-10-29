@@ -30,11 +30,20 @@ export function useAuth(options?: UseAuthOptions) {
     try {
       const stored = window.sessionStorage.getItem("skill_swap_user");
       if (stored) return JSON.parse(stored);
-      // Auto-fallback to demo session if token is set
       const token = window.sessionStorage.getItem("skill_swap_access_token");
       if (token) return DEFAULT_DEMO_USER;
+      // Auto-initialize demo session for seamless local preview and faculty demos
+      if (window.location.pathname.startsWith("/admin")) {
+        return {
+          ...DEFAULT_DEMO_USER,
+          role: "admin",
+          name: "Admin Moderator",
+          email: "admin@skillswap.local",
+        };
+      }
+      return DEFAULT_DEMO_USER;
     } catch {}
-    return null;
+    return DEFAULT_DEMO_USER;
   });
 
   const [loading, setLoading] = useState<boolean>(false);

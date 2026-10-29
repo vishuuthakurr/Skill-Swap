@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Skill-Swap Data Flow Diagram (Level 0 and Level 1)</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0;
+      margin: 0;
+      width: 1600px;
+      height: 1120px;
+    }
+    svg {
+      width: 1600px;
+      height: 1120px;
+      background: #ffffff;
+    }
+    .title {
+      font-size: 22px;
+      font-weight: 800;
+      fill: #1e293b;
+      letter-spacing: -0.5px;
+    }
+    .subtitle {
+      font-size: 13px;
+      font-weight: 500;
+      fill: #64748b;
+    }
+    .sec-header {
+      font-size: 15px;
+      font-weight: 700;
+      fill: #0f172a;
+      letter-spacing: 0.5px;
+    }
+    .box-entity {
+      fill: #f8fafc;
+      stroke: #334155;
+      stroke-width: 2.2;
+      rx: 8;
+    }
+    .entity-title {
+      font-size: 14px;
+      font-weight: 700;
+      fill: #0f172a;
+      text-anchor: middle;
+    }
+    .entity-sub {
+      font-size: 11px;
+      font-weight: 500;
+      fill: #475569;
+      text-anchor: middle;
+    }
+    .process-circle {
+      fill: #eff6ff;
+      stroke: #2563eb;
+      stroke-width: 2.5;
+    }
+    .process-box {
+      fill: #f0fdf4;
+      stroke: #16a34a;
+      stroke-width: 2.2;
+      rx: 10;
+    }
+    .process-num {
+      font-size: 12px;
+      font-weight: 800;
+      fill: #1d4ed8;
+      text-anchor: middle;
+    }
+    .process-title {
+      font-size: 13px;
+      font-weight: 700;
+      fill: #0f172a;
+      text-anchor: middle;
+    }
+    .process-desc {
+      font-size: 10.5px;
+      font-weight: 500;
+      fill: #475569;
+      text-anchor: middle;
+    }
+    .store-box {
+      fill: #fefce8;
+      stroke: #ca8a04;
+      stroke-width: 2;
+    }
+    .store-label {
+      font-size: 12px;
+      font-weight: 700;
+      fill: #854d0e;
+      text-anchor: middle;
+    }
+    .store-sub {
+      font-size: 10px;
+      font-weight: 500;
+      fill: #a16207;
+      text-anchor: middle;
+    }
+    .flow-line {
+      stroke: #475569;
+      stroke-width: 1.6;
+      fill: none;
+    }
+    .flow-line-blue {
+      stroke: #2563eb;
+      stroke-width: 1.6;
+      fill: none;
+    }
+    .flow-line-green {
+      stroke: #059669;
+      stroke-width: 1.6;
+      fill: none;
+    }
+    .flow-line-purple {
+      stroke: #7c3aed;
+      stroke-width: 1.6;
+      fill: none;
+    }
+    .flow-text {
+      font-size: 10.5px;
+      font-weight: 600;
+      fill: #1e293b;
+      text-anchor: middle;
+    }
+    .flow-bg {
+      fill: #ffffff;
+      opacity: 0.92;
+      rx: 3;
+    }
+  </style>
+</head>
+<body>
+<svg viewBox="0 0 1600 1120" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Arrowhead markers -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#475569" />
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#2563eb" />
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#059669" />
+    </marker>
+    <marker id="arrow-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#7c3aed" />
+    </marker>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <!-- Canvas Border -->
+  <rect x="15" y="15" width="1570" height="1090" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" rx="12" />
+
+  <!-- Main Header Banner -->
+  <rect x="15" y="15" width="1570" height="60" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1" rx="12" />
+  <text x="45" y="45" class="title">SKILL-SWAP: DATA FLOW DIAGRAM (DFD)</text>
+  <text x="45" y="63" class="subtitle">Architectural Data Flow Model • Level 0 (Context Level) &amp; Level 1 (Major Functional Processes)</text>
+  <text x="1520" y="52" font-size="13" font-weight="700" fill="#64748b" text-anchor="end">PSIT CHE • BCA PROJECT</text>
+
+  <!-- ======================================================== -->
+  <!-- SECTION 1: LEVEL 0 - CONTEXT DIAGRAM (y: 85 to 430)       -->
+  <!-- ======================================================== -->
+  <rect x="35" y="85" width="1530" height="340" fill="#fcfcfd" stroke="#e2e8f0" stroke-width="1.5" rx="8" />
+  <rect x="45" y="95" width="280" height="26" fill="#e0f2fe" rx="4" />
+  <text x="55" y="113" class="sec-header" fill="#0369a1">3.3.1 LEVEL 0: CONTEXT DIAGRAM</text>
+
+  <!-- LEVEL 0: External Entity - USER (Learner / Teacher) -->
+  <g filter="url(#shadow)">
+    <rect x="65" y="160" width="220" height="190" class="box-entity" stroke="#0284c7" />
+    <rect x="65" y="160" width="220" height="34" fill="#e0f2fe" rx="8" />
+    <text x="175" y="182" class="entity-title" fill="#0369a1">USER</text>
+    <text x="175" y="202" class="entity-sub">(Learner / Teacher)</text>
+    <line x1="75" y1="215" x2="275" y2="215" stroke="#cbd5e1" stroke-width="1" />
+    <text x="175" y="235" font-size="11" fill="#334155" text-anchor="middle">• Registration &amp; OTP</text>
+    <text x="175" y="255" font-size="11" fill="#334155" text-anchor="middle">• Teach &amp; Learn Skills</text>
+    <text x="175" y="275" font-size="11" fill="#334155" text-anchor="middle">• Assessment Quizzes</text>
+    <text x="175" y="295" font-size="11" fill="#334155" text-anchor="middle">• Live Sessions &amp; Chat</text>
+    <text x="175" y="315" font-size="11" fill="#334155" text-anchor="middle">• Digital Certificates</text>
+  </g>
+
+  <!-- LEVEL 0: Process 0.0 CENTRAL SYSTEM -->
+  <g filter="url(#shadow)">
+    <circle cx="800" cy="255" r="105" class="process-circle" />
+    <circle cx="800" cy="255" r="97" fill="none" stroke="#93c5fd" stroke-width="1.5" stroke-dasharray="4 3" />
+    <text x="800" y="225" font-size="15" font-weight="800" fill="#1d4ed8" text-anchor="middle">PROCESS 0.0</text>
+    <text x="800" y="248" font-size="18" font-weight="800" fill="#0f172a" text-anchor="middle">SKILL-SWAP</text>
+    <text x="800" y="268" font-size="18" font-weight="800" fill="#0f172a" text-anchor="middle">PLATFORM SYSTEM</text>
+    <text x="800" y="290" font-size="11.5" font-weight="600" fill="#475569" text-anchor="middle">Core Application Engine</text>
+    <text x="800" y="306" font-size="10.5" font-weight="500" fill="#64748b" text-anchor="middle">(Django REST + Node.js + MongoDB)</text>
+  </g>
+
+  <!-- LEVEL 0: External Entity - ADMINISTRATOR -->
+  <g filter="url(#shadow)">
+    <rect x="1310" y="130" width="230" height="120" class="box-entity" stroke="#7c3aed" />
+    <rect x="1310" y="130" width="230" height="32" fill="#ede9fe" rx="8" />
+    <text x="1425" y="152" class="entity-title" fill="#6d28d9">ADMINISTRATOR</text>
+    <text x="1425" y="178" font-size="11" fill="#334155" text-anchor="middle">• Manage Question Bank</text>
+    <text x="1425" y="198" font-size="11" fill="#334155" text-anchor="middle">• Monitor Live Sessions</text>
+    <text x="1425" y="218" font-size="11" fill="#334155" text-anchor="middle">• Review Reported Profiles</text>
+    <text x="1425" y="238" font-size="11" fill="#334155" text-anchor="middle">• Platform Audit &amp; Controls</text>
+  </g>
+
+  <!-- LEVEL 0: External Entity - EXTERNAL THIRD-PARTY SERVICES -->
+  <g filter="url(#shadow)">
+    <rect x="1310" y="280" width="230" height="125" class="box-entity" stroke="#ea580c" />
+    <rect x="1310" y="280" width="230" height="32" fill="#ffedd5" rx="8" />
+    <text x="1425" y="302" class="entity-title" fill="#c2410c">EXTERNAL SERVICES</text>
+    <text x="1425" y="328" font-size="11" fill="#334155" text-anchor="middle">• Gmail SMTP (OTP Dispatch)</text>
+    <text x="1425" y="348" font-size="11" fill="#334155" text-anchor="middle">• ZegoCloud / WebRTC (Video API)</text>
+    <text x="1425" y="368" font-size="11" fill="#334155" text-anchor="middle">• Cloudinary (Media &amp; Recordings)</text>
+    <text x="1425" y="388" font-size="11" fill="#334155" text-anchor="middle">• Canvas / PDF Signature</text>
+  </g>
+
+  <!-- LEVEL 0: FLOWS - USER <-> SYSTEM -->
+  <!-- User -> System (Upper Arrow: Credentials & Skill Preferences) -->
+  <path d="M 285 200 L 690 200" class="flow-line-blue" marker-end="url(#arrow-blue)" />
+  <rect x="340" y="185" width="290" height="16" class="flow-bg" />
+  <text x="485" y="197" class="flow-text" fill="#1e40af">Registration Details, Login Credentials, Skill Choices</text>
+
+  <!-- User -> System (Mid-Upper Arrow: Quizzes & Match Requests) -->
+  <path d="M 285 235 L 695 235" class="flow-line-blue" marker-end="url(#arrow-blue)" />
+  <rect x="350" y="222" width="275" height="16" class="flow-bg" />
+  <text x="487" y="234" class="flow-text" fill="#1e40af">Assessment Quiz Answers, Connection Requests, Chat Msg</text>
+
+  <!-- System -> User (Mid-Lower: Match Lists & Teacher Status) -->
+  <path d="M 695 275 L 295 275" class="flow-line-green" marker-end="url(#arrow-green)" />
+  <rect x="350" y="262" width="280" height="16" class="flow-bg" />
+  <text x="490" y="274" class="flow-text" fill="#065f46">Verified Teacher Badge, Match Results, Chat Notification</text>
+
+  <!-- System -> User (Lower: Live Video & Certificate) -->
+  <path d="M 690 310 L 295 310" class="flow-line-green" marker-end="url(#arrow-green)" />
+  <rect x="360" y="297" width="260" height="16" class="flow-bg" />
+  <text x="490" y="309" class="flow-text" fill="#065f46">Live Video Call Stream, Digital Certificates, Ratings</text>
+
+  <!-- LEVEL 0: FLOWS - SYSTEM <-> ADMIN -->
+  <!-- Admin -> System -->
+  <path d="M 1310 170 L 910 210" class="flow-line-purple" marker-end="url(#arrow-purple)" />
+  <rect x="990" y="174" width="250" height="16" class="flow-bg" />
+  <text x="1115" y="186" class="flow-text" fill="#6d28d9">Question Bank CRUD, Ban/Resolve Actions</text>
+
+  <!-- System -> Admin -->
+  <path d="M 910 235 L 1300 195" class="flow-line" marker-end="url(#arrow)" />
+  <rect x="990" y="214" width="245" height="16" class="flow-bg" />
+  <text x="1112" y="226" class="flow-text" fill="#334155">Reported Profiles, Active Sessions &amp; Metrics</text>
+
+  <!-- LEVEL 0: FLOWS - SYSTEM <-> EXTERNAL SERVICES -->
+  <!-- System -> External Services -->
+  <path d="M 905 285 L 1300 320" class="flow-line" marker-end="url(#arrow)" />
+  <rect x="990" y="292" width="250" height="16" class="flow-bg" />
+  <text x="1115" y="304" class="flow-text" fill="#c2410c">OTP Send Request, Video Token Req, Upload Video</text>
+
+  <!-- External Services -> System -->
+  <path d="M 1310 355 L 905 320" class="flow-line" marker-end="url(#arrow)" />
+  <rect x="990" y="337" width="250" height="16" class="flow-bg" />
+  <text x="1115" y="349" class="flow-text" fill="#334155">OTP Delivery Status, WebRTC Stream, Video CDN URL</text>
+
+
+  <!-- ======================================================== -->
+  <!-- SECTION 2: LEVEL 1 - DETAILED PROCESSES (y: 440 to 1090)  -->
+  <!-- ======================================================== -->
+  <rect x="35" y="440" width="1530" height="650" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" rx="8" />
+  <rect x="45" y="450" width="370" height="26" fill="#ecfdf5" rx="4" />
+  <text x="55" y="468" class="sec-header" fill="#047857">3.3.2 LEVEL 1: DETAILED FUNCTIONAL PROCESSES</text>
+
+  <!-- EXTERNAL ENTITIES ON SIDES FOR LEVEL 1 -->
+  <!-- Left Side: User Entity -->
+  <g filter="url(#shadow)">
+    <rect x="55" y="520" width="145" height="490" class="box-entity" stroke="#0284c7" />
+    <rect x="55" y="520" width="145" height="30" fill="#e0f2fe" rx="8" />
+    <text x="127" y="540" class="entity-title" fill="#0369a1">USER</text>
+    <text x="127" y="560" font-size="11" font-weight="600" fill="#475569" text-anchor="middle">(Learner / Teacher)</text>
+    
+    <text x="127" y="600" font-size="10.5" fill="#334155" text-anchor="middle">• Credentials &amp; OTP</text>
+    <text x="127" y="620" font-size="10.5" fill="#334155" text-anchor="middle">• Skill Selections</text>
+    <text x="127" y="680" font-size="10.5" fill="#334155" text-anchor="middle">• Quiz Responses</text>
+    <text x="127" y="760" font-size="10.5" fill="#334155" text-anchor="middle">• Connect Request</text>
+    <text x="127" y="780" font-size="10.5" fill="#334155" text-anchor="middle">• Chat &amp; Live Video</text>
+    <text x="127" y="860" font-size="10.5" fill="#334155" text-anchor="middle">• Rating &amp; Feedback</text>
+    <text x="127" y="940" font-size="10.5" fill="#334155" text-anchor="middle">• Certificate PDF</text>
+  </g>
+
+  <!-- Right Side: Admin Entity & External Services -->
+  <g filter="url(#shadow)">
+    <rect x="1400" y="520" width="145" height="240" class="box-entity" stroke="#7c3aed" />
+    <rect x="1400" y="520" width="145" height="30" fill="#ede9fe" rx="8" />
+    <text x="1472" y="540" class="entity-title" fill="#6d28d9">ADMIN</text>
+    <text x="1472" y="575" font-size="10.5" fill="#334155" text-anchor="middle">• Questions CRUD</text>
+    <text x="1472" y="605" font-size="10.5" fill="#334155" text-anchor="middle">• Audit Logs</text>
+    <text x="1472" y="635" font-size="10.5" fill="#334155" text-anchor="middle">• Review Reports</text>
+    <text x="1472" y="665" font-size="10.5" fill="#334155" text-anchor="middle">• Session Monitoring</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="1400" y="790" width="145" height="220" class="box-entity" stroke="#ea580c" />
+    <rect x="1400" y="790" width="145" height="30" fill="#ffedd5" rx="8" />
+    <text x="1472" y="810" class="entity-title" fill="#c2410c">SERVICES</text>
+    <text x="1472" y="845" font-size="10.5" fill="#334155" text-anchor="middle">• Gmail (OTP)</text>
+    <text x="1472" y="875" font-size="10.5" fill="#334155" text-anchor="middle">• ZegoCloud (WebRTC)</text>
+    <text x="1472" y="905" font-size="10.5" fill="#334155" text-anchor="middle">• Cloudinary (CDN)</text>
+  </g>
+
+  <!-- ======================================================= -->
+  <!-- LEVEL 1: 6 PROCESSES (Middle Columns)                   -->
+  <!-- ======================================================= -->
+
+  <!-- Process 1.0: User Management -->
+  <g filter="url(#shadow)">
+    <rect x="290" y="515" width="250" height="75" class="process-box" stroke="#0284c7" fill="#f0f9ff" />
+    <rect x="290" y="515" width="250" height="24" fill="#bae6fd" rx="10" />
+    <text x="415" y="531" class="process-num" fill="#0369a1">PROCESS 1.0</text>
+    <text x="415" y="555" class="process-title">User Management &amp; Auth</text>
+    <text x="415" y="573" class="process-desc">Registration, OTP, JWT Login, Profiles</text>
+  </g>
+
+  <!-- Process 2.0: Skill Assessment -->
+  <g filter="url(#shadow)">
+    <rect x="290" y="615" width="250" height="75" class="process-box" stroke="#2563eb" fill="#eff6ff" />
+    <rect x="290" y="615" width="250" height="24" fill="#bfdbfe" rx="10" />
+    <text x="415" y="631" class="process-num" fill="#1d4ed8">PROCESS 2.0</text>
+    <text x="415" y="655" class="process-title">Skill Assessment &amp; Quiz Engine</text>
+    <text x="415" y="673" class="process-desc">Timer, Randomized MCQs, Teacher Badge</text>
+  </g>
+
+  <!-- Process 3.0: Matching and Chat -->
+  <g filter="url(#shadow)">
+    <rect x="290" y="715" width="250" height="75" class="process-box" stroke="#059669" fill="#ecfdf5" />
+    <rect x="290" y="715" width="250" height="24" fill="#a7f3d0" rx="10" />
+    <text x="415" y="731" class="process-num" fill="#047857">PROCESS 3.0</text>
+    <text x="415" y="755" class="process-title">Matching &amp; Real-Time Chat</text>
+    <text x="415" y="773" class="process-desc">Two-Way Skill Synergy, Socket.io Chat</text>
+  </g>
+
+  <!-- Process 4.0: Live Session & Recording -->
+  <g filter="url(#shadow)">
+    <rect x="290" y="815" width="250" height="75" class="process-box" stroke="#d97706" fill="#fffbeb" />
+    <rect x="290" y="815" width="250" height="24" fill="#fde68a" rx="10" />
+    <text x="415" y="831" class="process-num" fill="#b45309">PROCESS 4.0</text>
+    <text x="415" y="855" class="process-title">Session &amp; Video Recording</text>
+    <text x="415" y="873" class="process-desc">WebRTC Video Call, Room Auth, Cloudinary</text>
+  </g>
+
+  <!-- Process 5.0: Certification & Rating -->
+  <g filter="url(#shadow)">
+    <rect x="290" y="915" width="250" height="75" class="process-box" stroke="#7c3aed" fill="#faf5ff" />
+    <rect x="290" y="915" width="250" height="24" fill="#ddd6fe" rx="10" />
+    <text x="415" y="931" class="process-num" fill="#6d28d9">PROCESS 5.0</text>
+    <text x="415" y="955" class="process-title">Certification &amp; Feedback</text>
+    <text x="415" y="973" class="process-desc">Session Verification, Star Rating, PDF Cert</text>
+  </g>
+
+  <!-- Process 6.0: Administration -->
+  <g filter="url(#shadow)">
+    <rect x="290" y="1005" width="250" height="70" class="process-box" stroke="#dc2626" fill="#fef2f2" />
+    <rect x="290" y="1005" width="250" height="22" fill="#fecaca" rx="10" />
+    <text x="415" y="1020" class="process-num" fill="#b91c1c">PROCESS 6.0</text>
+    <text x="415" y="1042" class="process-title">Administration &amp; Oversight</text>
+    <text x="415" y="1060" class="process-desc">Question Bank, Session Mon., User Reports</text>
+  </g>
+
+
+  <!-- ======================================================= -->
+  <!-- LEVEL 1: DATA STORES (Columns on the Right, x: 740 to 1100) -->
+  <!-- ======================================================= -->
+
+  <!-- D1: Users & Auth Store -->
+  <g filter="url(#shadow)">
+    <path d="M 720 520 L 980 520 L 980 575 L 720 575" fill="#fefce8" stroke="#ca8a04" stroke-width="2" />
+    <line x1="770" y1="520" x2="770" y2="575" stroke="#ca8a04" stroke-width="2" />
+    <text x="745" y="553" class="store-label">D1</text>
+    <text x="875" y="542" font-size="12.5" font-weight="700" fill="#854d0e" text-anchor="middle">users</text>
+    <text x="875" y="560" font-size="10.5" fill="#a16207" text-anchor="middle">Accounts, OTP, Verified Teacher, Profiles</text>
+  </g>
+
+  <!-- D2: Skills & Questions Store -->
+  <g filter="url(#shadow)">
+    <path d="M 720 620 L 980 620 L 980 675 L 720 675" fill="#fefce8" stroke="#ca8a04" stroke-width="2" />
+    <line x1="770" y1="620" x2="770" y2="675" stroke="#ca8a04" stroke-width="2" />
+    <text x="745" y="653" class="store-label">D2</text>
+    <text x="875" y="642" font-size="12.5" font-weight="700" fill="#854d0e" text-anchor="middle">skills &amp; questions</text>
+    <text x="875" y="660" font-size="10.5" fill="#a16207" text-anchor="middle">Skill Catalog, MCQ Bank, Passing Score</text>
+  </g>
+
+  <!-- D3: Matches & Messages Store -->
+  <g filter="url(#shadow)">
+    <path d="M 720 720 L 980 720 L 980 775 L 720 775" fill="#fefce8" stroke="#ca8a04" stroke-width="2" />
+    <line x1="770" y1="720" x2="770" y2="775" stroke="#ca8a04" stroke-width="2" />
+    <text x="745" y="753" class="store-label">D3</text>
+    <text x="875" y="742" font-size="12.5" font-weight="700" fill="#854d0e" text-anchor="middle">matches &amp; messages</text>
+    <text x="875" y="760" font-size="10.5" fill="#a16207" text-anchor="middle">Connections, Pending/Accepted, Chat Logs</text>
+  </g>
+
+  <!-- D4: Sessions & Recordings Store -->
+  <g filter="url(#shadow)">
+    <path d="M 720 820 L 980 820 L 980 875 L 720 875" fill="#fefce8" stroke="#ca8a04" stroke-width="2" />
+    <line x1="770" y1="820" x2="770" y2="875" stroke="#ca8a04" stroke-width="2" />
+    <text x="745" y="853" class="store-label">D4</text>
+    <text x="875" y="842" font-size="12.5" font-weight="700" fill="#854d0e" text-anchor="middle">sessions &amp; recordings</text>
+    <text x="875" y="860" font-size="10.5" fill="#a16207" text-anchor="middle">Session Schedules, Status, Cloudinary URLs</text>
+  </g>
+
+  <!-- D5: Certificates & Feedback Store -->
+  <g filter="url(#shadow)">
+    <path d="M 720 920 L 980 920 L 980 975 L 720 975" fill="#fefce8" stroke="#ca8a04" stroke-width="2" />
+    <line x1="770" y1="920" x2="770" y2="975" stroke="#ca8a04" stroke-width="2" />
+    <text x="745" y="953" class="store-label">D5</text>
+    <text x="875" y="942" font-size="12.5" font-weight="700" fill="#854d0e" text-anchor="middle">certificates &amp; ratings</text>
+    <text x="875" y="960" font-size="10.5" fill="#a16207" text-anchor="middle">Certificate Serial, Student, Mentor, Stars</text>
+  </g>
+
+  <!-- D6: Reports & Audit Logs Store -->
+  <g filter="url(#shadow)">
+    <path d="M 720 1005 L 980 1005 L 980 1060 L 720 1060" fill="#fefce8" stroke="#ca8a04" stroke-width="2" />
+    <line x1="770" y1="1005" x2="770" y2="1060" stroke="#ca8a04" stroke-width="2" />
+    <text x="745" y="1038" class="store-label">D6</text>
+    <text x="875" y="1027" font-size="12.5" font-weight="700" fill="#854d0e" text-anchor="middle">reports &amp; audit_logs</text>
+    <text x="875" y="1045" font-size="10.5" fill="#a16207" text-anchor="middle">Profile Reports, Admin Action Logs</text>
+  </g>
+
+  <!-- ======================================================= -->
+  <!-- LEVEL 1: FLOW ARROWS & DATA LABELS                      -->
+  <!-- ======================================================= -->
+
+  <!-- Flow: User <-> Process 1.0 (Auth) -->
+  <path d="M 200 540 L 290 540" class="flow-line-blue" marker-end="url(#arrow-blue)" />
+  <rect x="205" y="527" width="80" height="13" class="flow-bg" />
+  <text x="245" y="537" font-size="9" font-weight="600" fill="#1e40af" text-anchor="middle">Reg/Login/OTP</text>
+
+  <path d="M 290 565 L 200 565" class="flow-line-green" marker-end="url(#arrow-green)" />
+  <rect x="210" y="555" width="70" height="13" class="flow-bg" />
+  <text x="245" y="565" font-size="9" font-weight="600" fill="#065f46" text-anchor="middle">JWT + Profile</text>
+
+  <!-- Flow: Process 1.0 <-> D1 Users -->
+  <path d="M 540 545 L 720 545" class="flow-line" marker-end="url(#arrow)" />
+  <rect x="580" y="534" width="105" height="14" class="flow-bg" />
+  <text x="632" y="545" font-size="9" font-weight="600" fill="#334155" text-anchor="middle">Save User / Query</text>
+
+  <!-- Flow: Process 1.0 -> External Gmail -->
+  <path d="M 540 525 C 650 490, 1250 490, 1400 820" class="flow-line" stroke-dasharray="3 3" marker-end="url(#arrow)" />
+  <rect x="1050" y="485" width="130" height="14" class="flow-bg" />
+  <text x="1115" y="496" font-size="9" font-weight="600" fill="#ea580c" text-anchor="middle">Send OTP Email (SMTP)</text>
+
+  <!-- Flow: User <-> Process 2.0 (Assessment) -->
+  <path d="M 200 640 L 290 640" class="flow-line-blue" marker-end="url(#arrow-blue)" />
+  <rect x="210" y="628" width="70" height="13" class="flow-bg" />
+  <text x="245" y="638" font-size="9" font-weight="600" fill="#1e40af" text-anchor="middle">Answers</text>
+
+  <path d="M 290 665 L 200 665" class="flow-line-green" marker-end="url(#arrow-green)" />
+  <rect x="205" y="655" width="80" height="13" class="flow-bg" />
+  <text x="245" y="665" font-size="9" font-weight="600" fill="#065f46" text-anchor="middle">Score &amp; Badge</text>
+
+  <!-- Flow: Process 2.0 <-> D2 Questions -->
+  <path d="M 540 645 L 720 645" class="flow-line" marker-end="url(#arrow)" />
+  <rect x="575" y="634" width="115" height="14" class="flow-bg" />
+  <text x="632" y="645" font-size="9" font-weight="600" fill="#334155" text-anchor="middle">Fetch MCQs / Update</text>
+
+  <!-- Flow: Process 2.0 -> D1 (Update verified_teacher) -->
+  <path d="M 480 615 L 480 575 C 480 565, 710 565, 720 565" class="flow-line" marker-end="url(#arrow)" />
+  <rect x="560" y="580" width="120" height="14" class="flow-bg" />
+  <text x="620" y="591" font-size="9" font-weight="600" fill="#334155" text-anchor="middle">Set Verified Status</text>
+
+  <!-- Flow: User <-> Process 3.0 (Matching & Chat) -->
+  <path d="M 200 740 L 290 740" class="flow-line-blue" marker-end="url(#arrow-blue)" />
+  <rect x="210" y="728" width="70" height="13" class="flow-bg" />
+  <text x="245" y="738" font-size="9" font-weight="600" fill="#1e40af" text-anchor="middle">Connect/Msg</text>
+
+  <path d="M 290 765 L 200 765" class="flow-line-green" marker-end="url(#arrow-green)" />
+  <rect x="205" y="755" width="80" height="13" class="flow-bg" />
+  <text x="245" y="765" font-size="9" font-weight="600" fill="#065f46" text-anchor="middle">Matches/Stream</text>
+
+  <!-- Flow: Process 3.0 <-> D3 Matches & Messages -->
+  <path d="M 540 745 L 720 745" class="flow-line" marker-end="url(#arrow)" />
+  <rect x="575" y="734" width="115" height="14" class="flow-bg" />
+  <text x="632" y="745" font-size="9" font-weight="600" fill="#334155" text-anchor="middle">Match Pair &amp; Chat Log</text>
+
+  <!-- Flow: Process 3.0 reads D1 user skills -->
+  <path d="M 500 715 L 500 565 C 500 550, 710 550, 720 555" class="flow-line" stroke-dasharray="3 3" marker-end="url(#arrow)" />
+  <rect x="545" y="695" width="140" height="14" class="flow-bg" />
+  <text x="615" y="706" font-size="9" font-weight="600" fill="#334155" text-anchor="middle">Read Teach/Learn Skills</text>
+
+  <!-- Flow: User <-> Process 4.0 (Live Session) -->
+  <path d="M 200 840 L 290 840" class="flow-line-blue" marker-end="url(#arrow-blue)" />
+  <rect x="205" y="828" width="80" height="13" class="flow-bg" />
+  <text x="245" y="838" font-size="9" font-weight="600" fill="#1e40af" text-anchor="middle">Join WebRTC</text>
+
+  <path d="M 290 865 L 200 865" class="flow-line-green" marker-end="url(#arrow-green)" />
+  <rect x="205" y="855" width="80" height="13" class="flow-bg" />
+  <text x="245" y="865" font-size="9" font-weight="600" fill="#065f46" text-anchor="middle">Video Stream</text>
+
+  <!-- Flow: Process 4.0 <-> D4 Sessions -->
+  <path d="M 540 845 L 720 845" class="flow-line" marker-end="url(#arrow)" />
+  <rect x="575" y="834" width="115" height="14" class="flow-bg" />
+  <text x="632" y="845" font-size="9" font-weight="600" fill="#334155" text-anchor="middle">Create/Update Session</text>
+
+  <!-- Flow: Process 4.0 <-> External Services (ZegoCloud & Cloudinary) -->
+  <path d="M 540 865 C 700 890, 1200 890, 1400 885" class="flow-line" marker-end="url(#arrow)" />
+  <rect x="1060" y="877" width="180" height="14" class="flow-bg" />
+  <text x="1150" y="888" font-size="9" font-weight="600" fill="#ea580c" text-anchor="middle">Token / Save Video to Cloudinary</text>
+
+  <!-- Flow: User <-> Process 5.0 (Certification) -->
+  <path d="M 200 940 L 290 940" class="flow-line-blue" marker-end="url(#arrow-blue)" />
+  <rect x="205" y="928" width="80" height="13" class="flow-bg" />
+  <text x="245" y="938" font-size="9" font-weight="600" fill="#1e40af" text-anchor="middle">Ratings/Review</text>
+
+  <path d="M 290 965 L 200 965" class="flow-line-green" marker-end="url(#arrow-green)" />
+  <rect x="205" y="955" width="80" height="13" class="flow-bg" />
+  <text x="245" y="965" font-size="9" font-weight="600" fill="#065f46" text-anchor="middle">Download Cert</text>
+
+  <!-- Flow: Process 5.0 <-> D5 Certificates -->
+  <path d="M 540 945 L 720 945" class="flow-line" marker-end="url(#arrow)" />
+  <rect x="575" y="934" width="115" height="14" class="flow-bg" />
+  <text x="632" y="945" font-size="9" font-weight="600" fill="#334155" text-anchor="middle">Store Certificate Hash</text>
+
+  <!-- Flow: Process 5.0 verifies D4 session completed -->
+  <path d="M 500 915 L 500 875 C 500 865, 710 865, 720 865" class="flow-line" stroke-dasharray="3 3" marker-end="url(#arrow)" />
+  <rect x="545" y="890" width="130" height="14" class="flow-bg" />
+  <text x="610" y="901" font-size="9" font-weight="600" fill="#334155" text-anchor="middle">Verify Completed Status</text>
+
+  <!-- Flow: Admin <-> Process 6.0 (Administration) -->
+  <path d="M 1400 680 C 1200 1010, 600 1025, 540 1025" class="flow-line-purple" marker-end="url(#arrow-purple)" />
+  <rect x="1050" y="985" width="170" height="14" class="flow-bg" />
+  <text x="1135" y="996" font-size="9" font-weight="600" fill="#6d28d9" text-anchor="middle">Admin Actions / Moderation</text>
+
+  <!-- Flow: Process 6.0 <-> D6 Reports -->
+  <path d="M 540 1045 L 720 1045" class="flow-line" marker-end="url(#arrow)" />
+  <rect x="575" y="1034" width="115" height="14" class="flow-bg" />
+  <text x="632" y="1045" font-size="9" font-weight="600" fill="#334155" text-anchor="middle">Audit Logs &amp; Reports</text>
+
+  <!-- Flow: Process 6.0 manages D2 Questions -->
+  <path d="M 480 1005 L 480 685 C 480 670, 710 670, 720 670" class="flow-line" marker-end="url(#arrow)" />
+  <rect x="520" y="970" width="150" height="14" class="flow-bg" />
+  <text x="595" y="981" font-size="9" font-weight="600" fill="#b91c1c" text-anchor="middle">Manage Question Catalog</text>
+
+  <!-- Legend Bottom Right -->
+  <g transform="translate(1020, 520)">
+    <rect x="0" y="0" width="340" height="220" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.2" rx="6" />
+    <text x="170" y="22" font-size="12" font-weight="700" fill="#1e293b" text-anchor="middle">DFD NOTATION LEGEND (Gane &amp; Sarson)</text>
+    <line x1="15" y1="32" x2="325" y2="32" stroke="#e2e8f0" stroke-width="1" />
+    
+    <!-- Item 1: External Entity -->
+    <rect x="20" y="45" width="45" height="25" fill="#f8fafc" stroke="#334155" stroke-width="1.8" rx="3" />
+    <text x="80" y="62" font-size="11" font-weight="600" fill="#334155">External Entity (Source / Sink)</text>
+
+    <!-- Item 2: Process (Circle / Rounded Rect) -->
+    <rect x="20" y="85" width="45" height="25" fill="#f0f9ff" stroke="#0284c7" stroke-width="1.8" rx="6" />
+    <text x="80" y="102" font-size="11" font-weight="600" fill="#0284c7">Process (Transformation)</text>
+
+    <!-- Item 3: Data Store -->
+    <path d="M 20 128 L 65 128 L 65 148 L 20 148" fill="#fefce8" stroke="#ca8a04" stroke-width="1.8" />
+    <line x1="32" y1="128" x2="32" y2="148" stroke="#ca8a04" stroke-width="1.8" />
+    <text x="80" y="142" font-size="11" font-weight="600" fill="#854d0e">Data Store (Database / Collection)</text>
+
+    <!-- Item 4: Data Flow Arrow -->
+    <line x1="20" y1="172" x2="62" y2="172" stroke="#475569" stroke-width="2" marker-end="url(#arrow)" />
+    <text x="80" y="176" font-size="11" font-weight="600" fill="#475569">Data Flow (Direction of Movement)</text>
+
+    <!-- Item 5: Note -->
+    <text x="20" y="205" font-size="10" font-weight="500" fill="#64748b">Compliant with IEEE 1016 Software Design Standards</text>
+  </g>
+
+</svg>
+</body>
+</html>

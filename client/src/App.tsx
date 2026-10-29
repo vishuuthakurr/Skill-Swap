@@ -27,6 +27,7 @@ import {
   MySkills,
   Notifications,
   Profile,
+  Recordings,
   Sessions,
   SimpleMemberPage,
 } from "./pages/Workspace";
@@ -114,13 +115,7 @@ function Router() {
         {(params) => <SessionDetail sessionId={params.sessionId} />}
       </Route>
       <Route path="/app/certificates" component={Certificates} />
-      <Route path="/app/recordings">
-        <SimpleMemberPage
-          title="Recordings"
-          copy="Private recording references from completed exchanges, protected by signed Cloudinary access."
-          icon={LockKeyhole}
-        />
-      </Route>
+      <Route path="/app/recordings" component={Recordings} />
       <Route path="/app/notifications" component={Notifications} />
       <Route path="/app/settings" component={Profile} />
       <Route path="/app/help">

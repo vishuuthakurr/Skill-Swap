@@ -38,11 +38,18 @@ def append_audit(actor_id: str, action: str, target_type: str, target_id: str, r
     return event_id
 
 
+def _as_aware_utc(value: datetime) -> datetime:
+    """Normalize datetimes read from Mongo: BSON returns naive UTC values."""
+    if value.tzinfo is None:
+        return value.replace(tzinfo=timezone.utc)
+    return value
+
+
 def allow_rate_limited_action(key: str, limit: int, window_seconds: int) -> bool:
     now = datetime.now(timezone.utc)
     digest = hashlib.sha256(key.encode("utf-8")).hexdigest()
     record = mongo_db().rate_limits.find_one({"key": digest})
-    if not record or record["window_ends_at"] <= now:
+    if not record or _as_aware_utc(record["window_ends_at"]) <= now:
         mongo_db().rate_limits.replace_one({"key": digest}, {"key": digest, "count": 1, "window_ends_at": now + timedelta(seconds=window_seconds)}, upsert=True)
         return True
     if record["count"] >= limit:

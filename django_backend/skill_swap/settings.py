@@ -104,11 +104,32 @@ SMTP_USERNAME = os.environ.get("SMTP_USERNAME", "")
 SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD", "")
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", SMTP_USERNAME)
 
+if not SMTP_USERNAME or not SMTP_PASSWORD:
+    import warnings as _warnings
+
+    _warnings.warn(
+        "SMTP credentials are not configured — OTP verification emails cannot be sent. "
+        "Set SMTP_USERNAME and SMTP_PASSWORD (a Gmail App Password) in the backend .env. "
+        "In DEBUG mode the OTP is printed to the console instead."
+    )
+
 CLOUDINARY_CLOUD_NAME = os.environ.get("CLOUDINARY_CLOUD_NAME", "")
 CLOUDINARY_API_KEY = os.environ.get("CLOUDINARY_API_KEY", "")
 CLOUDINARY_API_SECRET = os.environ.get("CLOUDINARY_API_SECRET", "")
 ZEGO_APP_ID = os.environ.get("ZEGO_APP_ID", "1234567890" if DEBUG else "")
 ZEGO_SERVER_SECRET = os.environ.get("ZEGO_SERVER_SECRET", "0123456789abcdef0123456789abcdef" if DEBUG else "")
+
+if DEBUG and (
+    ZEGO_APP_ID == "1234567890"
+    or ZEGO_SERVER_SECRET.startswith("0123456789abcdef")
+    or CLOUDINARY_CLOUD_NAME in {"demo-cloud", "your-cloud-name"}
+):
+    import warnings as _warnings
+
+    _warnings.warn(
+        "Cloudinary/ZegoCloud credentials look like template placeholders — avatar uploads "
+        "and live video rooms will fail until real values are set in the backend .env."
+    )
 
 # Production security defaults; local development can override explicitly through environment.
 SECURE_SSL_REDIRECT = os.environ.get("DJANGO_SECURE_SSL_REDIRECT", "true").lower() == "true" and not DEBUG

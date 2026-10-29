@@ -29,9 +29,15 @@ DJANGO_SECRET_KEY=dev-secret-key-for-local-skillswap-testing-only-12345
 DJANGO_DEBUG=true
 JWT_SECRET=dev-secret-key-for-local-skillswap-testing-only-12345
 
-# Email OTP (Optional: Use real Gmail App Password if testing real email delivery)
+# Email OTP (Required for real OTP emails; optional in DEBUG mode where the OTP is printed to the Django console)
+# How to get a Gmail App Password:
+#   1. Enable 2-Step Verification on your Google account (myaccount.google.com/security)
+#   2. Go to myaccount.google.com/apppasswords
+#   3. Create an app password for "Mail" — copy the 16-character code (spaces are fine)
+#   4. Paste it below as SMTP_PASSWORD and set SMTP_USERNAME + DEFAULT_FROM_EMAIL to the same Gmail address
 SMTP_USERNAME=your-email@gmail.com
-SMTP_PASSWORD=your-gmail-app-password
+SMTP_PASSWORD=abcdefghijklmnop   # 16-char Google App Password, NOT your Gmail login password
+DEFAULT_FROM_EMAIL=your-email@gmail.com
 
 # ZegoCloud (Video Calls)
 ZEGO_APP_ID=1234567890

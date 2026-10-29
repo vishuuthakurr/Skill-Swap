@@ -12,10 +12,13 @@ import {
   Clock3,
   ExternalLink,
   FileCheck2,
+  Film,
   Flag,
   LockKeyhole,
   MessageCircle,
   MoreHorizontal,
+  Play,
+  Download,
   Search,
   ShieldCheck,
   Sparkles,
@@ -888,15 +891,24 @@ export function Certificates() {
                 </p>
               </div>
 
-              <div className="flex items-center justify-between p-4 text-xs">
+              <div className="flex flex-wrap items-center justify-between gap-3 p-4 text-xs">
                 <div className="flex items-center gap-1.5 font-bold text-emerald-600">
                   <ShieldCheck className="size-4" /> Cryptographically Valid
                 </div>
-                <Link href="/verify-certificate?token=SS-VERIF-2026-PY">
-                  <Button variant="ghost" size="sm" className="text-xs font-semibold text-blue-600 hover:text-blue-700">
-                    Public Registry Check <ChevronRight className="ml-1 size-3" />
+                <div className="flex items-center gap-2">
+                  <Link href="/verify-certificate?token=SS-VERIF-2026-PY">
+                    <Button variant="ghost" size="sm" className="text-xs font-semibold text-blue-600 hover:text-blue-700">
+                      Public Registry Check <ChevronRight className="ml-1 size-3" />
+                    </Button>
+                  </Link>
+                  <Button
+                    size="sm"
+                    onClick={() => window.print()}
+                    className="rounded-lg bg-emerald-600 px-3 text-xs font-semibold text-white hover:bg-emerald-700 shadow-sm"
+                  >
+                    <Download className="mr-1.5 size-3.5" /> Download PDF
                   </Button>
-                </Link>
+                </div>
               </div>
             </SoftCard>
 
@@ -967,6 +979,129 @@ export function Notifications() {
               <p className="mt-1 text-xs leading-relaxed text-slate-600">
                 {item.copy}
               </p>
+            </div>
+          </SoftCard>
+        ))}
+      </div>
+    </DashboardLayout>
+  );
+}
+
+export function Recordings() {
+  const [query, setQuery] = useState("");
+  const recordings = [
+    {
+      id: "rec-py-vikram-01",
+      title: "Python Data Analysis & Pandas Automation",
+      partner: "Vikram Mehta",
+      initials: "VM",
+      tone: "bg-purple-100 text-purple-700",
+      date: "Oct 24, 2026",
+      duration: "44m 12s",
+      size: "184 MB",
+      format: "1080p MP4",
+      status: "Available",
+      storage: "Cloudinary Encrypted CDN",
+    },
+    {
+      id: "rec-photo-aarav-02",
+      title: "Photography Lighting & Angle Mastery",
+      partner: "Aarav Sharma",
+      initials: "AR",
+      tone: "bg-blue-100 text-blue-700",
+      date: "Oct 22, 2026",
+      duration: "52m 30s",
+      size: "242 MB",
+      format: "720p HD",
+      status: "Available",
+      storage: "Cloudinary Encrypted CDN",
+    },
+    {
+      id: "rec-french-sana-03",
+      title: "Conversational French & Idiomatic Expressions",
+      partner: "Sana Mir",
+      initials: "SM",
+      tone: "bg-indigo-100 text-indigo-700",
+      date: "Oct 18, 2026",
+      duration: "36m 15s",
+      size: "140 MB",
+      format: "1080p MP4",
+      status: "Available",
+      storage: "Cloudinary Encrypted CDN",
+    },
+  ];
+
+  const filtered = recordings.filter(
+    (r) =>
+      r.title.toLowerCase().includes(query.toLowerCase()) ||
+      r.partner.toLowerCase().includes(query.toLowerCase())
+  );
+
+  return (
+    <DashboardLayout>
+      <WorkspaceHeader
+        eyebrow="Media Archival"
+        title="Exchange Session Recordings"
+        copy="Private recording references from completed exchanges, protected by signed Cloudinary access."
+        action={
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
+            <Input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search recordings..."
+              className="h-10 w-full rounded-xl border-slate-200 bg-white pl-9 text-xs sm:w-64"
+            />
+          </div>
+        }
+      />
+
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {filtered.map((item) => (
+          <SoftCard key={item.id} className="overflow-hidden p-0 flex flex-col justify-between">
+            <div className="relative aspect-video w-full bg-slate-900 flex items-center justify-center group cursor-pointer overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+              <div className="z-10 flex size-12 items-center justify-center rounded-full bg-blue-600/90 text-white shadow-lg transition-transform group-hover:scale-110">
+                <Play className="ml-1 size-5 fill-white" />
+              </div>
+              <div className="absolute bottom-3 left-3 right-3 z-10 flex items-center justify-between text-[11px] text-white/90">
+                <span className="font-mono bg-black/60 px-2 py-0.5 rounded backdrop-blur-xs">
+                  {item.duration}
+                </span>
+                <span className="bg-emerald-500/80 font-bold px-2 py-0.5 rounded text-[10px]">
+                  {item.format}
+                </span>
+              </div>
+            </div>
+
+            <div className="p-5 flex-1 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between gap-2">
+                  <Badge className="bg-blue-50 text-blue-700 border-blue-200 text-[10px]">
+                    {item.status}
+                  </Badge>
+                  <span className="text-[11px] text-slate-400">{item.date}</span>
+                </div>
+                <h3 className="mt-2 text-base font-bold text-slate-900 leading-snug">
+                  {item.title}
+                </h3>
+                <div className="mt-3 flex items-center gap-2 text-xs text-slate-600">
+                  <AvatarBubble initials={item.initials} tone={item.tone} />
+                  <span>with <strong>{item.partner}</strong></span>
+                </div>
+                <p className="mt-2.5 text-[11px] text-slate-400 flex items-center gap-1">
+                  <LockKeyhole className="size-3 text-emerald-600" /> {item.storage} ({item.size})
+                </p>
+              </div>
+
+              <div className="mt-5 flex gap-2 border-t border-slate-100 pt-3.5">
+                <Button className="flex-1 rounded-lg bg-blue-600 text-xs font-semibold text-white hover:bg-blue-700 h-9">
+                  <Play className="mr-1.5 size-3.5 fill-white" /> Play Video
+                </Button>
+                <Button variant="outline" className="rounded-lg border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 h-9 px-3">
+                  <Download className="size-3.5" />
+                </Button>
+              </div>
             </div>
           </SoftCard>
         ))}
