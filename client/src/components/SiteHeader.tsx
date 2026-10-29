@@ -36,7 +36,7 @@ const categories = [
 ];
 
 export default function SiteHeader() {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, logout } = useAuth();
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -154,15 +154,25 @@ export default function SiteHeader() {
         {/* Auth CTA Actions */}
         <div className="hidden items-center gap-3 md:flex">
           {isAuthenticated ? (
-            <Link
-              href={
-                user?.role === "admin" ? "/admin/dashboard" : "/app/dashboard"
-              }
-            >
-              <Button className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-blue-500/25 transition-all hover:bg-blue-700">
-                Workspace <ArrowRight className="ml-1.5 size-4" />
+            <div className="flex items-center gap-2">
+              <Link
+                href={
+                  user?.role === "admin" ? "/admin/dashboard" : "/app/dashboard"
+                }
+              >
+                <Button className="rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-sm shadow-blue-500/25 transition-all hover:bg-blue-700">
+                  {user?.name || "Workspace"} <ArrowRight className="ml-1.5 size-3.5" />
+                </Button>
+              </Link>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={logout}
+                className="text-xs font-medium text-slate-500 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
+              >
+                Log Out
               </Button>
-            </Link>
+            </div>
           ) : (
             <>
               <Link href="/login">

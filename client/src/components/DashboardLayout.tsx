@@ -111,6 +111,16 @@ export default function DashboardLayout({
       String(sidebarWidth)
     );
   }, [sidebarWidth, variant]);
+
+  useEffect(() => {
+    if (!loading && !user && typeof window !== "undefined") {
+      const current = window.location.pathname;
+      if (current.startsWith("/app") || current.startsWith("/admin")) {
+        window.location.replace("/login?redirect=" + encodeURIComponent(current));
+      }
+    }
+  }, [loading, user]);
+
   if (loading) return <DashboardLayoutSkeleton />;
   if (!user)
     return (

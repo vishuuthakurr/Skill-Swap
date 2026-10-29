@@ -156,7 +156,15 @@ export function Login() {
         "skill_swap_access_token",
         result.access_token
       );
-      window.location.assign("/app/dashboard");
+      if (result.user) {
+        window.sessionStorage.setItem(
+          "skill_swap_user",
+          JSON.stringify(result.user)
+        );
+      }
+      const params = new URLSearchParams(window.location.search);
+      const redirect = params.get("redirect") || "/app/dashboard";
+      window.location.assign(redirect);
     } catch (caught) {
       setError(
         caught instanceof Error
@@ -438,9 +446,9 @@ export function VerifyEmail() {
             <p className="mt-1 text-xs text-slate-600">
               Your profile is authenticated. Set up your learning skills to get matched.
             </p>
-            <Link href="/onboarding">
+            <Link href="/app/dashboard">
               <Button className="mt-4 w-full rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 text-xs font-semibold">
-                Complete Profile Setup <ArrowUpRight className="ml-1.5 size-4" />
+                Go to My Dashboard <ArrowUpRight className="ml-1.5 size-4" />
               </Button>
             </Link>
           </div>
@@ -456,6 +464,12 @@ export function VerifyEmail() {
                   "skill_swap_access_token",
                   result.access_token
                 );
+                if (result.user) {
+                  window.sessionStorage.setItem(
+                    "skill_swap_user",
+                    JSON.stringify(result.user)
+                  );
+                }
                 setVerified(true);
               } catch (caught) {
                 setError(

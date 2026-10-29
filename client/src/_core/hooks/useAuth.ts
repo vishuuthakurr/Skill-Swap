@@ -30,8 +30,6 @@ export function useAuth(options?: UseAuthOptions) {
     try {
       const stored = window.sessionStorage.getItem("skill_swap_user");
       if (stored) return JSON.parse(stored);
-      const token = window.sessionStorage.getItem("skill_swap_access_token");
-      if (token) return DEFAULT_DEMO_USER;
 
       // Allow quick demo preview via ?demo=1 query parameter
       const params = new URLSearchParams(window.location.search);
@@ -102,7 +100,7 @@ export function useAuth(options?: UseAuthOptions) {
     }
     setUser(null);
     if (typeof window !== "undefined") {
-      window.location.href = "/login";
+      window.location.replace("/");
     }
   }, []);
 
